@@ -1,4 +1,6 @@
 import { PREFS_STORAGE_KEY } from "@/lib/client/storage";
+import { DEFAULT_STYLE, STYLES } from "@/lib/style";
+import { DEFAULT_FONT, FONTS } from "@/lib/font";
 
 export const THEMES = [
   "daylight",
@@ -215,10 +217,19 @@ export function applyTheme(theme: ThemeId): void {
 
 /**
  * Runs before the first paint so a stored theme never flashes the default.
- * Kept ES5-ish on purpose: it runs before the bundle.
+ * Also restores the stored style (look-and-feel layer) and font. Kept ES5-ish
+ * on purpose: it runs before the bundle.
  */
 export const THEME_INIT_SCRIPT = `(function(){try{var valid=${JSON.stringify(
   THEMES,
 )};var dark=${JSON.stringify(
   Object.fromEntries(THEMES.map((id) => [id, THEME_META[id].scheme === "dark"])),
-)};var raw=localStorage.getItem(${JSON.stringify(PREFS_STORAGE_KEY)});var t=null;try{t=raw?JSON.parse(raw).theme:null;}catch(e){}if(!t||valid.indexOf(t)<0){t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"midnight":"daylight";}document.documentElement.setAttribute("data-theme",t);document.documentElement.setAttribute("data-scheme",dark[t]?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","daylight");document.documentElement.setAttribute("data-scheme","light");}})();`;
+)};var styles=${JSON.stringify(STYLES)};var fonts=${JSON.stringify(
+  FONTS,
+)};var raw=localStorage.getItem(${JSON.stringify(
+  PREFS_STORAGE_KEY,
+)});var t=null;var s=null;var f=null;try{var p=raw?JSON.parse(raw):null;t=p?p.theme:null;s=p?p.style:null;f=p?p.font:null;}catch(e){}if(!t||valid.indexOf(t)<0){t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"midnight":"daylight";}document.documentElement.setAttribute("data-theme",t);document.documentElement.setAttribute("data-scheme",dark[t]?"dark":"light");if(!s||styles.indexOf(s)<0){s=${JSON.stringify(
+  DEFAULT_STYLE,
+)};}document.documentElement.setAttribute("data-style",s);if(!f||fonts.indexOf(f)<0){f=${JSON.stringify(
+  DEFAULT_FONT,
+)};}document.documentElement.setAttribute("data-font",f);}catch(e){document.documentElement.setAttribute("data-theme","daylight");document.documentElement.setAttribute("data-scheme","light");document.documentElement.setAttribute("data-style","liquid-glass");document.documentElement.setAttribute("data-font","system");}})();`;

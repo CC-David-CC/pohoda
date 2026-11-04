@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Pohoda — weather, clearly",
     short_name: "Pohoda",
     description:
-      "Hourly, 7-day and 30-day weather with animated skies and eight icon sets.",
+      "Hourly, 7-day and 30-day weather with animated skies, nineteen icon packs, colour themes, styles and fonts.",
     start_url: "/",
     display: "standalone",
     orientation: "portrait-primary",

@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import { ICON_PACKS, usePrefs, type IconPack } from "@/lib/client/prefs";
-import {
-  DEFAULT_CUSTOM_THEME,
-  type CustomTheme,
-} from "@/lib/client/custom-theme";
 import { APP_VERSION, REPO_URL } from "@/lib/config";
 import { LOCALES, LOCALE_META, type Locale, type MessageKey } from "@/lib/i18n";
 import { placeLabel, placeSecondary } from "@/lib/places";
 import { THEMES, THEME_META } from "@/lib/theme";
+import { STYLES } from "@/lib/style";
+import { FONTS } from "@/lib/font";
 import type { PrecipUnit, PressureUnit, TemperatureUnit, WindUnit } from "@/lib/types";
 import { PROVIDERS, PROVIDER_MAP } from "@/lib/weather/providers";
 import type { WeatherKind } from "@/lib/types";
@@ -103,9 +101,8 @@ export function SettingsDialog({
   // Themes, icon packs and providers are long lists, so every one of them
   // starts folded and the summary line still shows what is selected.
   const [themesOpen, setThemesOpen] = useState(false);
-  const [customOpen, setCustomOpen] = useState(false);
-  const [customName, setCustomName] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [stylesOpen, setStylesOpen] = useState(false);
+  const [fontsOpen, setFontsOpen] = useState(false);
   const [iconsOpen, setIconsOpen] = useState(false);
   const [providersOpen, setProvidersOpen] = useState(false);
 
@@ -180,179 +177,74 @@ export function SettingsDialog({
 
       <section className="settings-block">
         <SettingsToggle
-          title={t("settings.appearance.customTheme")}
-          sub={
-            prefs.theme === "custom"
-              ? t("settings.appearance.customThemeText")
-              : t(`theme.${prefs.theme}` as MessageKey)
-          }
-          open={customOpen}
-          controls="settings-custom"
+          title={t("settings.appearance.styles")}
+          sub={t(`style.${prefs.style}` as MessageKey)}
+          open={stylesOpen}
+          controls="settings-styles"
           showLabel={t("settings.toggle.show")}
           hideLabel={t("settings.toggle.hide")}
-          onToggle={() => setCustomOpen((value) => !value)}
+          onToggle={() => setStylesOpen((value) => !value)}
         />
-        {customOpen ? (
-          <div id="settings-custom" className="settings-collapse">
-            <p className="hint">{t("settings.appearance.customThemeText")}</p>
-            <div className="custom-theme-grid">
-              {(["bg", "accent", "card"] as const).map((key) => {
-                const fallback = DEFAULT_CUSTOM_THEME;
-                const value =
-                  prefs.customTheme?.[key] ??
-                  (key === "bg" ? fallback.bg : key === "accent" ? fallback.accent : fallback.card);
-                const label =
-                  key === "bg"
-                    ? t("settings.appearance.customBg")
-                    : key === "accent"
-                      ? t("settings.appearance.customAccent")
-                      : t("settings.appearance.customCard");
-                return (
-                  <label key={key} className="custom-theme-field">
-                    <span>{label}</span>
-                    <div className="custom-color-row">
-                      <input
-                        type="color"
-                        value={value}
-                        onChange={(e) => {
-                          const base = prefs.customTheme ?? DEFAULT_CUSTOM_THEME;
-                          const next: CustomTheme = { ...base, [key]: e.target.value };
-                          update({ customTheme: next, theme: "custom" });
-                          if (!customName) setCustomName("Моя тема");
-                        }}
-                      />
-                      <input
-                        type="text"
-                        className="custom-hex"
-                        value={value}
-                        maxLength={7}
-                        onChange={(e) => {
-                          const v = e.target.value.trim();
-                          if (!/^#[0-9a-fA-F]{6}$/.test(v)) return;
-                          const base = prefs.customTheme ?? DEFAULT_CUSTOM_THEME;
-                          const next: CustomTheme = { ...base, [key]: v };
-                          update({ customTheme: next, theme: "custom" });
-                        }}
-                      />
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-            <div className="custom-theme-name-row">
-              <input
-                type="text"
-                className="custom-name-input"
-                value={customName}
-                onChange={(e) => setCustomName(e.target.value)}
-                placeholder={t("settings.appearance.customTheme")}
-                maxLength={40}
-              />
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => {
-                  const draft = prefs.customTheme ?? DEFAULT_CUSTOM_THEME;
-                  if (editingId) {
-                    const next = prefs.savedThemes.map((th) =>
-                      th.id === editingId
-                        ? { ...th, name: customName.trim() || th.name, bg: draft.bg, accent: draft.accent, card: draft.card }
-                        : th,
-                    );
-                    update({ savedThemes: next });
-                  } else {
-                    const id = `custom-${Date.now()}`;
-                    const name = customName.trim() || "Моя тема";
-                    update({
-                      savedThemes: [...prefs.savedThemes, { id, name, bg: draft.bg, accent: draft.accent, card: draft.card }],
-                    });
-                    setEditingId(id);
+        {stylesOpen ? (
+          <div id="settings-styles" className="settings-collapse">
+            <p className="hint">{t("settings.appearance.stylesText")}</p>
+            <label className="field">
+              <span className="field-label">{t("settings.appearance.styleLabel")}</span>
+              <select
+                className="style-select"
+                value={prefs.style}
+                aria-label={t("a11y.style")}
+                onChange={(event) => {
+                  const next = event.target.value;
+                  if (STYLES.includes(next as (typeof STYLES)[number])) {
+                    update({ style: next });
                   }
                 }}
               >
-                {editingId ? "Сохранить изменения" : "Сохранить тему"}
-              </button>
-              {editingId ? (
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={() => {
-                    setEditingId(null);
-                    setCustomName("");
-                  }}
-                >
-                  Новая
-                </button>
-              ) : null}
-            </div>
-            <div
-              className="custom-theme-preview"
-              style={{
-                background: prefs.customTheme?.bg ?? DEFAULT_CUSTOM_THEME.bg,
-                borderColor: prefs.customTheme?.accent ?? DEFAULT_CUSTOM_THEME.accent,
-              }}
-            >
-              <span style={{ color: prefs.customTheme?.accent ?? DEFAULT_CUSTOM_THEME.accent }}>
-                Акцент
-              </span>
-              <span style={{ background: prefs.customTheme?.card ?? DEFAULT_CUSTOM_THEME.card }} />
-            </div>
-            {prefs.savedThemes.length > 0 ? (
-              <div className="saved-themes">
-                <h4 className="saved-themes-title">Сохранённые</h4>
-                {prefs.savedThemes.map((theme) => (
-                  <div key={theme.id} className="saved-theme-row">
-                    <span
-                      className="saved-theme-swatch"
-                      style={{
-                        background: theme.bg,
-                        borderColor: theme.accent,
-                      }}
-                    >
-                      <span style={{ background: theme.card }} />
-                    </span>
-                    <span className="saved-theme-name">{theme.name}</span>
-                    <div className="saved-theme-actions">
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => {
-                          update({ customTheme: { bg: theme.bg, accent: theme.accent, card: theme.card }, theme: "custom" });
-                          setCustomName(theme.name);
-                          setEditingId(theme.id);
-                        }}
-                      >
-                        Применить
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => {
-                          update({ customTheme: { bg: theme.bg, accent: theme.accent, card: theme.card }, theme: "custom" });
-                          setCustomName(theme.name);
-                          setEditingId(theme.id);
-                        }}
-                      >
-                        Изменить
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => {
-                          update({ savedThemes: prefs.savedThemes.filter((t) => t.id !== theme.id) });
-                          if (editingId === theme.id) {
-                            setEditingId(null);
-                            setCustomName("");
-                          }
-                        }}
-                      >
-                        Удалить
-                      </button>
-                    </div>
-                  </div>
+                {STYLES.map((style) => (
+                  <option key={style} value={style}>
+                    {t(`style.${style}` as MessageKey)}
+                  </option>
                 ))}
-              </div>
-            ) : null}
+              </select>
+            </label>
+          </div>
+        ) : null}
+      </section>
+
+      <section className="settings-block">
+        <SettingsToggle
+          title={t("settings.appearance.font")}
+          sub={t(`font.${prefs.font}` as MessageKey)}
+          open={fontsOpen}
+          controls="settings-fonts"
+          showLabel={t("settings.toggle.show")}
+          hideLabel={t("settings.toggle.hide")}
+          onToggle={() => setFontsOpen((value) => !value)}
+        />
+        {fontsOpen ? (
+          <div id="settings-fonts" className="settings-collapse">
+            <p className="hint">{t("settings.appearance.fontText")}</p>
+            <label className="field">
+              <span className="field-label">{t("settings.appearance.fontLabel")}</span>
+              <select
+                className="style-select"
+                value={prefs.font}
+                aria-label={t("a11y.font")}
+                onChange={(event) => {
+                  const next = event.target.value;
+                  if (FONTS.includes(next as (typeof FONTS)[number])) {
+                    update({ font: next });
+                  }
+                }}
+              >
+                {FONTS.map((font) => (
+                  <option key={font} value={font}>
+                    {t(`font.${font}` as MessageKey)}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         ) : null}
       </section>

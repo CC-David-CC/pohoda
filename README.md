@@ -11,7 +11,7 @@ Live demo: https://pohoda-weather.vercel.app
 - **Readable at a glance.** A large temperature, a short condition line, and the three numbers people actually check: rain chance, wind, humidity.
 - **Ranges, not just numbers.** Every day row shows a temperature band placed on the week's scale, so a cold snap or a warm spell is visible without reading a table. Bands follow one colour ramp — violet well below freezing, sky blue at 0 °C, red in the heat — so the week reads as a temperature map.
 - **Honest about limits.** Free forecasts stop at 10–16 days. The 30-day tab fills the rest with ten-year climate averages and labels those days as `climate` instead of pretending they are a forecast.
-- **Weather you can see.** A full-screen scene (sun, moon, drifting clouds, canvas rain, snow, fog and lightning) reacts to the current condition, and eighteen icon packs are all animated.
+- **Weather you can see.** A full-screen scene (sun, moon, drifting clouds, canvas rain, snow, fog and lightning) reacts to the current condition, and nineteen icon packs are all animated.
 - **Ten years of the same day.** The “This day” block at the bottom compares today with the archive for the same date in each of the last ten years.
 
 ## Screenshots
@@ -26,7 +26,7 @@ Live demo: https://pohoda-weather.vercel.app
 
 | Colour schemes | Icon packs |
 | --- | --- |
-| ![Twenty-seven colour schemes](docs/desktop-appearance.png) | ![Eighteen icon packs](docs/desktop-icons.png) |
+| ![Twenty-seven colour schemes](docs/desktop-appearance.png) | ![Icon packs](docs/desktop-icons.png) |
 
 | Light theme | Black theme |
 | --- | --- |
@@ -88,11 +88,12 @@ Commercial providers that charge for their API were removed on purpose, so there
 
 ### Appearance
 
+- **Nine styles — whole design languages, picked from a dropdown in Settings:** `liquid-glass` (default: translucent blurred cards with a specular highlight), `flat` (solid blocks, no shadows), `skeuomorphism` (bevelled, embossed panels), `aurora` (northern-lights wash behind dark glass), `neon` (glowing accent outlines), `brutalism` (zero radius, thick borders, hard offset shadows), `claymorphism` (puffy moulded cards), `vaporwave` (magenta/cyan retro eighties night) and `minimalism` (hairline borders, nothing extra). Most styles follow the active theme's colours; `aurora`, `neon` and `vaporwave` bring their own dark palettes.
 - **Twenty-seven colour schemes:** `daylight`, `sand`, `mint`, `blossom` (light) and `midnight`, `graphite`, `black`, `ink-red`, `ink-green`, `ink-blue`, `ink-cyan`, `ink-lime`, `ink-violet`, `ink-pink`, `ink-orange`, `ink-gold`, `ink-teal`, `ink-indigo`, `ink-fuchsia`, `ink-viridian`, `ink-bronze`, `ink-amber`, `ink-mulberry`, `aurora`, `nebula`, `ocean`, `ember` (dark). The sixteen `ink-*` schemes are the black palette with a coloured accent instead of white.
-- **Fourteen hand-drawn animated icon packs:** outline, duotone, solid, clay, neon, glass, sticker, sketch, candy, retro, pulse, pixel, emoji, glyph.
-- **Four ready-made Meteocons sets:** `meteo-fill`, `meteo-flat`, `meteo-line`, `meteo-mono` — the [Meteocons](https://meteocons.com) library by Bas Milius (MIT), vendored as animated SVG plus static copies for the calm and off motion levels.
+- **Ten interface fonts** — System, Grotesk, Geometric, Humanist, Rounded, Serif, Elegant, Slab, Condensed and Mono. All are operating-system stacks, so nothing is downloaded and switching is instant; picked from a dropdown in Settings.
+- **Nineteen animated icon packs in thirteen distinct families:** hand-drawn `outline`, `duotone`, `solid`, `clay`, `neon`, `glass` and `emoji`; own-geometry `pixel` (8-bit), `bubble` (wobbling circles), `vivid` (gradients), `origami` (faceted paper), `blueprint` (dashed drawing), `terminal` (ASCII) and `constellation` (star dots); plus `cutout` (layered paper appliqué), `etching` (rolling hatch lines), `hologram` (iridescent sweep), `badge` (weather cut out of a solid disc) and `glitch` (RGB-split ghosts). All packs animate with GPU-friendly transform/opacity only (etching adds a hatch roll, blueprint a cheap dash march); the motion switch (full/calm/off) applies to every pack.
 - **Full-screen scenes** for clear, partly cloudy, overcast, fog, rain, snow and thunderstorms, with drifting colour fields, moving clouds, canvas particles for precipitation and a lightning flash for storms.
-- **A wind card with a tree and grass** that bend further and faster as the wind picks up.
+- **A living, seasonal wind scene** — three different trees (a stiff fir, a big broadleaf, a small round one) on a dense narrow lawn, five wind-force levels (calm / light / moderate / fresh / gale) that tune every animation, and precipitation that reacts to the wind: leaves fall straight down in still air, drift sideways at a breeze and get blasted near-horizontally in a gale, always downwind; rain, drizzle, downpours, thunderstorm flashes, hail and snowfall fall straight from the live weather kind and blow downwind; snow settles on the crowns, fir tiers, branch tips and the ground. Broadleaf trees stand bare all winter and in early spring, and the season follows the real date — crown colours, leaf colours and the lawn change from spring to winter.
 - **Motion levels:** full, calm, off. An explicit choice always wins; the system's reduced-motion preference only sets the default on the first visit.
 - **Compact settings:** the colour-scheme, icon-pack and provider lists fold away by default and keep the current choice in their summary line.
 
@@ -109,7 +110,7 @@ Commercial providers that charge for their API were removed on purpose, so there
 - Responsive from 360 px phones to wide desktops.
 - The header stays pinned while the page scrolls.
 - Installable PWA with a manifest and maskable icons.
-- Theme is applied before first paint, so there is no flash of the wrong colours.
+- Theme and style are applied before first paint, so there is no flash of the wrong colours.
 - Settings persist in `localStorage` under `pohoda.prefs.v1`.
 - Automatic refresh every 10 minutes and when the tab becomes visible again.
 
@@ -178,7 +179,7 @@ app/
 components/
   AppShell.tsx         layout, tabs, dialogs, loading and error states
   WeatherScene.tsx     full-screen animated scene + canvas particles
-  WeatherIcon.tsx      eighteen icon packs, four of them Meteocons
+  WeatherIcon.tsx      nineteen animated icon packs
   views/               Today, Week, Month
   DayRow, SunCard, RangeBar, ThisDayCard, RadarDialog, Modal, SettingsDialog, PlaceDialog, Toast
 lib/
@@ -186,7 +187,7 @@ lib/
   history.ts           Open-Meteo archive loader for the “This day” block
   i18n/                six catalogues and typed message keys
   client/              settings store, weather hook
-  theme, units, time, format, places, types
+  theme, style, font, units, time, format, places, types
 tests/                 unit tests (Vitest)
 docs/                  screenshots
 ```
@@ -205,7 +206,6 @@ No API keys, database, cron job or external storage are required.
 
 Weather data by [Open-Meteo](https://open-meteo.com/) (including the ECMWF, DWD, NOAA, Météo-France, UK Met Office, JMA, GEM and KNMI model runs) and [MET Norway](https://www.met.no/). Place search by Open-Meteo geocoding, which uses GeoNames data. The radar dialog embeds [Windy.com](https://www.windy.com/) — map and radar data belong to Windy.
 
-Weather icons: [Meteocons](https://meteocons.com) by Bas Milius, MIT — the four `meteo-*` packs. The licence text ships with the files in `public/meteocons/LICENSE`.
 
 ## License
 

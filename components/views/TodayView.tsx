@@ -23,6 +23,7 @@ import { useState } from "react";
 import { RadarDialog } from "../RadarDialog";
 import { SunCard } from "../SunCard";
 import { ThisDayCard } from "../ThisDayCard";
+import { WeatherAlert } from "../WeatherAlert";
 import { WeatherIcon } from "../WeatherIcon";
 import { WindCard } from "../WindCard";
 
@@ -73,6 +74,7 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
 
   return (
     <div className="view view-today">
+      <WeatherAlert current={current} />
       <article className="card hero" data-tone={tone}>
         <div className="hero-main">
           <div className="hero-top">
@@ -196,6 +198,11 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
                 size={34}
               />
               <span className="hour-temp">{formatTemp(hour.temperature, prefs.temperature, locale, { withUnit: false })}</span>
+              <span
+                className="hour-prob"
+                style={{ height: `${Math.max(6, Math.round((hour.precipitationProbability ?? 0) * 0.26))}px` }}
+                aria-hidden="true"
+              />
               <span className={hour.precipitationProbability ? "hour-rain" : "hour-rain is-dry"}>
                 {hour.precipitationProbability === null
                   ? "·"

@@ -116,25 +116,13 @@ export interface WeatherSnapshot {
   notes: string[];
 }
 
-export interface SavedTheme {
-  id: string;
-  name: string;
-  bg: string;
-  accent: string;
-  card: string;
-}
-
 export interface Prefs {
   locale: string;
   theme: string;
-  /** User-built theme (bg / accent / card), used when theme === "custom". */
-  customTheme: {
-    bg: string;
-    accent: string;
-    card: string;
-  } | null;
-  /** Saved user-built themes. */
-  savedThemes: SavedTheme[];
+  /** Look-and-feel layer (liquid-glass, flat, …) applied via html[data-style]. */
+  style: string;
+  /** Interface typeface (system, grotesk, …) applied via html[data-font]. */
+  font: string;
   iconPack: string;
   provider: ProviderId;
   place: Place;

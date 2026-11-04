@@ -5,7 +5,7 @@ import "./globals.css";
 import "./weather.css";
 
 const description =
-  "Today, 7-day and 30-day weather with animated skies, hourly details, ten colour schemes, eight animated icon sets and seven data providers.";
+  "Today, 7-day and 30-day weather with animated skies, hourly details, twenty-seven colour schemes, nineteen icon packs and ten data providers.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(LIVE_URL),

@@ -591,11 +591,11 @@
 .wi-svgpack[data-pack="duotone"] {
   --wi-cloud: color-mix(in srgb, var(--brand) 20%, transparent);
   --wi-line: color-mix(in srgb, var(--brand) 65%, var(--text));
-  --wi-sun: #fbbf24;
-  --wi-ray: #f59e0b;
+  --wi-sun: var(--icon-sun);
+  --wi-ray: color-mix(in srgb, var(--icon-sun) 70%, var(--brand));
   --wi-moon: var(--icon-moon);
   --wi-drop: var(--icon-drop);
-  --wi-bolt: #f59e0b;
+  --wi-bolt: var(--icon-bolt);
   --wi-stroke: 1.5;
 }
 
@@ -650,22 +650,22 @@
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--brand) 60%, transparent));
 }
 
-.wi-svgpack[data-pack="glyph"] {
-  --wi-cloud: color-mix(in srgb, currentColor 12%, transparent);
-  --wi-line: currentColor;
-  --wi-sun: transparent;
-  --wi-ray: currentColor;
-  --wi-moon: transparent;
-  --wi-drop: currentColor;
-  --wi-bolt: currentColor;
-  --wi-star: currentColor;
-  --wi-stroke: 1.5;
-  opacity: 0.9;
+.wi-svgpack[data-pack="neon"][data-motion="full"] .wi-halo {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: wiHalo 3.6s ease-in-out infinite;
 }
 
-/* Six extra animated packs. They reuse the same geometry and only change the
-   paint, the stroke weight and the idle motion, so each one reads differently
-   without duplicating the shape code. */
+@keyframes wiHalo {
+  50% {
+    transform: scale(1.06);
+    opacity: 0.4;
+  }
+}
+
+/* Glass reuses the same geometry and only changes the paint, the stroke
+   weight and the idle motion, so it reads differently without duplicating
+   the shape code. */
 
 .wi-svgpack[data-pack="glass"] {
   --wi-cloud: color-mix(in srgb, var(--brand) 24%, transparent);
@@ -694,193 +694,10 @@
   }
 }
 
-.wi-svgpack[data-pack="sticker"] {
-  --wi-cloud: var(--brand);
-  --wi-line: #ffffff;
-  --wi-sun: var(--icon-sun);
-  --wi-ray: var(--icon-sun);
-  --wi-moon: var(--icon-moon);
-  --wi-drop: var(--icon-drop);
-  --wi-drop-w: 3.2;
-  --wi-bolt: var(--icon-bolt);
-  --wi-star: #ffffff;
-  --wi-stroke: 3.2;
-}
-
-.wi-svgpack[data-pack="sticker"] .wi-cloud path {
-  opacity: 0.9;
-}
-
-.wi-svgpack[data-pack="sticker"] .wi-svg {
-  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.16)) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.24));
-}
-
-.wi-svgpack[data-pack="sticker"][data-motion="full"] .wi-svg {
-  animation: wiSticker 4.4s ease-in-out infinite;
-}
-
-@keyframes wiSticker {
-  0%,
-  100% {
-    transform: rotate(-3deg);
-  }
-  50% {
-    transform: rotate(3deg);
-  }
-}
-
-.wi-svgpack[data-pack="sketch"] {
-  --wi-cloud: transparent;
-  --wi-line: currentColor;
-  --wi-sun: transparent;
-  --wi-ray: currentColor;
-  --wi-moon: transparent;
-  --wi-drop: currentColor;
-  --wi-bolt: transparent;
-  --wi-star: currentColor;
-  --wi-stroke: 1.9;
-  opacity: 0.9;
-}
-
-.wi-svgpack[data-pack="sketch"] .wi-cloud path,
-.wi-svgpack[data-pack="sketch"] .wi-sun > circle,
-.wi-svgpack[data-pack="sketch"] .wi-moon > circle,
-.wi-svgpack[data-pack="sketch"] .wi-bolt path,
-.wi-svgpack[data-pack="sketch"] .wi-hail circle {
-  stroke-dasharray: 3.4 2.2;
-}
-
-.wi-svgpack[data-pack="sketch"] .wi-svg {
-  filter: drop-shadow(1px 1px 0 color-mix(in srgb, currentColor 22%, transparent));
-}
-
-.wi-svgpack[data-pack="sketch"][data-motion="full"] .wi-svg {
-  animation: wiSketch 3.2s steps(3, end) infinite;
-}
-
-@keyframes wiSketch {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  33% {
-    transform: translate(0.6px, -0.4px);
-  }
-  66% {
-    transform: translate(-0.5px, 0.5px);
-  }
-}
-
-.wi-svgpack[data-pack="candy"] {
-  --wi-cloud: #f9a8d4;
-  --wi-line: #fdf2f8;
-  --wi-sun: #fde047;
-  --wi-ray: #facc15;
-  --wi-moon: #ddd6fe;
-  --wi-drop: #67e8f9;
-  --wi-drop-w: 3;
-  --wi-bolt: #fdba74;
-  --wi-star: #fef9c3;
-  --wi-stroke: 2.2;
-}
-
-.wi-svgpack[data-pack="candy"] .wi-svg {
-  filter: drop-shadow(0 4px 8px rgba(236, 72, 153, 0.28)) saturate(1.15);
-}
-
-.wi-svgpack[data-pack="candy"][data-motion="full"] .wi-svg {
-  animation: wiCandy 2.4s ease-in-out infinite;
-}
-
-@keyframes wiCandy {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-3px) scale(1.04);
-  }
-}
-
-.wi-svgpack[data-pack="retro"] {
-  --wi-cloud: #fcd34d;
-  --wi-line: #7c2d12;
-  --wi-sun: #fb923c;
-  --wi-ray: #7c2d12;
-  --wi-moon: #fde68a;
-  --wi-drop: #0e7490;
-  --wi-drop-w: 2.8;
-  --wi-bolt: #fb923c;
-  --wi-star: #7c2d12;
-  --wi-stroke: 2.1;
-}
-
-.wi-svgpack[data-pack="retro"] .wi-svg {
-  filter: drop-shadow(2.5px 2.5px 0 rgba(124, 45, 18, 0.35));
-}
-
-.wi-svgpack[data-pack="retro"][data-motion="full"] .wi-svg {
-  animation: wiRetro 5.5s ease-in-out infinite;
-}
-
-@keyframes wiRetro {
-  50% {
-    transform: translateY(-2px) rotate(-1.6deg);
-  }
-}
-
-.wi-svgpack[data-pack="pulse"] {
-  --wi-cloud: transparent;
-  --wi-line: var(--brand);
-  --wi-sun: transparent;
-  --wi-ray: var(--brand);
-  --wi-moon: transparent;
-  --wi-drop: var(--brand);
-  --wi-bolt: transparent;
-  --wi-star: var(--brand);
-  --wi-stroke: 2.6;
-}
-
-.wi-svgpack[data-pack="pulse"] .wi-svg {
-  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--brand) 55%, transparent));
-}
-
-.wi-svgpack[data-pack="pulse"][data-motion="full"] .wi-svg {
-  animation: wiBreath 2.8s ease-in-out infinite;
-}
-
-@keyframes wiBreath {
-  50% {
-    transform: scale(0.93);
-    opacity: 0.7;
-  }
-}
-
-/* ------------------------------- pixel ---------------------------------- */
-
-/* ------------------------- ready-made Meteocons -------------------------- */
-
-/* Meteocons carry their own SMIL animation inside the SVG file, so the
-   wrapper only handles sizing. Calm and off load the static copies. */
-.wi-meteo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+/* --------------------------- pixel (8-bit) -------------------------------- */
 
 .wi-pixel .wi-svg {
   image-rendering: pixelated;
-}
-
-.wi-pixel[data-motion="full"] .wi-svg {
-  animation: pxBob 2.8s steps(2, end) infinite;
-}
-
-@keyframes pxBob {
-  50% {
-    transform: translateY(-1px);
-  }
 }
 
 .wi-px-sun {
@@ -916,18 +733,37 @@
   opacity: 0.55;
 }
 
+.wi-pixel[data-motion="full"] .wi-svg {
+  animation: pxBob 2.8s steps(2, end) infinite;
+}
+
+.wi-pixel[data-motion="calm"] .wi-svg {
+  animation: pxBob 5.6s steps(2, end) infinite;
+}
+
+@keyframes pxBob {
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
 .wi-pixel[data-motion="full"] .wi-px-drop,
 .wi-pixel[data-motion="full"] .wi-px-flake {
   animation: pxFall 1.5s steps(3) infinite;
 }
 
-.wi-pixel[data-motion="full"] .wi-px-drop:nth-child(2),
-.wi-pixel[data-motion="full"] .wi-px-flake:nth-child(2) {
+.wi-pixel[data-motion="calm"] .wi-px-drop,
+.wi-pixel[data-motion="calm"] .wi-px-flake {
+  animation: pxFall 3s steps(3) infinite;
+}
+
+.wi-pixel[data-motion="full"] .wi-px-drop:nth-of-type(2),
+.wi-pixel[data-motion="full"] .wi-px-flake:nth-of-type(2) {
   animation-delay: 0.45s;
 }
 
-.wi-pixel[data-motion="full"] .wi-px-drop:nth-child(3),
-.wi-pixel[data-motion="full"] .wi-px-flake:nth-child(3) {
+.wi-pixel[data-motion="full"] .wi-px-drop:nth-of-type(3),
+.wi-pixel[data-motion="full"] .wi-px-flake:nth-of-type(3) {
   animation-delay: 0.9s;
 }
 
@@ -961,6 +797,836 @@
   50% {
     opacity: 0.25;
   }
+}
+
+/* ------------------------------ bubble ------------------------------------ */
+
+.wi-bubble .wb-sun {
+  fill: var(--icon-sun);
+}
+
+.wi-bubble .wb-sun-small {
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+.wi-bubble .wb-moon {
+  fill: var(--icon-moon);
+}
+
+.wi-bubble .wb-dot {
+  fill: var(--icon-star);
+}
+
+.wi-bubble .wb-bubble {
+  fill: color-mix(in srgb, var(--icon-cloud) 55%, transparent);
+}
+
+.wi-bubble .wb-bubble-mid {
+  fill: color-mix(in srgb, var(--icon-cloud) 82%, transparent);
+}
+
+.wi-bubble .wb-cloud-back {
+  opacity: 0.45;
+}
+
+.wi-bubble .wb-drop {
+  fill: var(--icon-drop);
+}
+
+.wi-bubble .wb-flake {
+  fill: var(--icon-cloud);
+}
+
+.wi-bubble .wb-bolt {
+  fill: var(--icon-bolt);
+}
+
+.wi-bubble .wb-fog ellipse {
+  fill: var(--icon-cloud);
+  opacity: 0.5;
+}
+
+.wi-bubble[data-motion="full"] .wb-orbit {
+  transform-origin: 32px 30px;
+  transform-box: view-box;
+  animation: wiSpin 22s linear infinite;
+}
+
+.wi-bubble[data-motion="calm"] .wb-orbit {
+  transform-origin: 32px 30px;
+  transform-box: view-box;
+  animation: wiSpin 80s linear infinite;
+}
+
+.wi-bubble[data-motion="full"] .wb-bubble {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: wbWobble 3.8s ease-in-out infinite;
+}
+
+.wi-bubble[data-motion="calm"] .wb-bubble {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: wbWobble 7.5s ease-in-out infinite;
+}
+
+.wi-bubble .wb-bubble-mid {
+  animation-delay: -1.3s;
+}
+
+@keyframes wbWobble {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.wi-bubble[data-motion="full"] .wb-drop,
+.wi-bubble[data-motion="full"] .wb-flake {
+  animation: wiFall 1.4s linear infinite;
+}
+
+.wi-bubble[data-motion="calm"] .wb-drop,
+.wi-bubble[data-motion="calm"] .wb-flake {
+  animation: wiFall 2.8s linear infinite;
+}
+
+.wi-bubble[data-motion="full"] .wb-fog ellipse {
+  animation: wiDrift 5.5s ease-in-out infinite;
+}
+
+.wi-bubble[data-motion="full"] .wb-fog ellipse:nth-child(2) {
+  animation-delay: -1.8s;
+}
+
+.wi-bubble[data-motion="full"] .wb-fog ellipse:nth-child(3) {
+  animation-delay: -3.6s;
+}
+
+/* ------------------------------- vivid ------------------------------------ */
+
+.wi-vivid .wi-rays line,
+.wi-vivid .wv-rays line {
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.wi-vivid .wv-corona {
+  fill: none;
+  stroke: color-mix(in srgb, #fbbf24 45%, transparent);
+  stroke-width: 1.4;
+}
+
+.wi-vivid .wv-star {
+  fill: #fef9c3;
+}
+
+.wi-vivid .wv-cloud-back {
+  opacity: 0.55;
+}
+
+.wi-vivid .wv-fog line {
+  stroke: #a5b4fc;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+.wi-vivid .wv-drop {
+  fill: #38bdf8;
+}
+
+.wi-vivid .wv-flake {
+  fill: #e0f2fe;
+}
+
+.wi-vivid .wv-bolt {
+  stroke: none;
+}
+
+.wi-vivid .wi-svg {
+  filter: saturate(1.25) drop-shadow(0 5px 10px rgba(2, 8, 23, 0.3));
+}
+
+.wi-vivid[data-motion="full"] .wv-corona {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: wvCorona 4.2s ease-in-out infinite;
+}
+
+@keyframes wvCorona {
+  50% {
+    transform: scale(1.08);
+    opacity: 0.5;
+  }
+}
+
+.wi-vivid[data-motion="full"] .wv-drop,
+.wi-vivid[data-motion="full"] .wv-flake {
+  animation: wiFall 1.15s linear infinite;
+}
+
+.wi-vivid[data-motion="calm"] .wv-drop,
+.wi-vivid[data-motion="calm"] .wv-flake {
+  animation: wiFall 2.4s linear infinite;
+}
+
+/* ------------------------------ origami ----------------------------------- */
+
+.wi-origami .wo-sun polygon {
+  fill: var(--icon-sun);
+}
+
+.wi-origami .wo-ray {
+  fill: color-mix(in srgb, var(--icon-sun) 70%, transparent);
+}
+
+.wi-origami .wo-facet {
+  fill: #ffffff;
+  opacity: 0.34;
+}
+
+.wi-origami .wo-moon {
+  fill: var(--icon-moon);
+}
+
+.wi-origami .wo-star {
+  fill: var(--icon-star);
+}
+
+.wi-origami .wo-cloud polygon {
+  fill: color-mix(in srgb, var(--icon-cloud) 78%, transparent);
+  stroke: none;
+}
+
+.wi-origami .wo-cloud-back {
+  opacity: 0.45;
+}
+
+.wi-origami .wo-fog polygon {
+  fill: var(--icon-cloud);
+  opacity: 0.55;
+}
+
+.wi-origami .wo-drop {
+  fill: var(--icon-drop);
+}
+
+.wi-origami .wo-flake {
+  fill: var(--icon-cloud);
+}
+
+.wi-origami .wo-bolt {
+  fill: var(--icon-bolt);
+}
+
+.wi-origami[data-motion="full"] .wo-rays {
+  transform-origin: 32px 30px;
+  transform-box: view-box;
+  animation: wiSpin 30s linear infinite;
+}
+
+.wi-origami[data-motion="calm"] .wo-rays {
+  transform-origin: 32px 30px;
+  transform-box: view-box;
+  animation: wiSpin 95s linear infinite;
+}
+
+.wi-origami[data-motion="full"] .wo-cloud {
+  transform-origin: 32px 40px;
+  transform-box: fill-box;
+  animation: woFold 5.4s ease-in-out infinite;
+}
+
+.wi-origami[data-motion="calm"] .wo-cloud {
+  transform-origin: 32px 40px;
+  transform-box: fill-box;
+  animation: woFold 10s ease-in-out infinite;
+}
+
+@keyframes woFold {
+  0%,
+  100% {
+    transform: rotate(-1.4deg) skewX(0deg);
+  }
+  50% {
+    transform: rotate(1.4deg) skewX(-1.2deg);
+  }
+}
+
+.wi-origami[data-motion="full"] .wo-drop,
+.wi-origami[data-motion="full"] .wo-flake {
+  animation: wiFall 1.3s linear infinite;
+}
+
+.wi-origami[data-motion="calm"] .wo-drop,
+.wi-origami[data-motion="calm"] .wo-flake {
+  animation: wiFall 2.6s linear infinite;
+}
+
+/* ----------------------------- blueprint ---------------------------------- */
+
+.wi-blueprint .wbp-line {
+  fill: none;
+  stroke: #38bdf8;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.wi-blueprint .wbp-dash {
+  stroke-dasharray: 4 3;
+}
+
+.wi-blueprint .wbp-thin {
+  stroke-width: 1.2;
+  opacity: 0.8;
+}
+
+.wi-blueprint .wbp-cross path {
+  fill: none;
+  stroke: #38bdf8;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.wi-blueprint .wbp-dot {
+  fill: #38bdf8;
+}
+
+.wi-blueprint .wbp-frame path {
+  fill: none;
+  stroke: #38bdf8;
+  stroke-width: 1.2;
+  opacity: 0.4;
+}
+
+.wi-blueprint .wbp-bolt {
+  fill: none;
+  stroke-width: 1.8;
+}
+
+.wi-blueprint[data-motion="full"] .wbp-dash {
+  animation: wbpMarch 2.6s linear infinite;
+}
+
+.wi-blueprint[data-motion="calm"] .wbp-dash {
+  animation: wbpMarch 6s linear infinite;
+}
+
+@keyframes wbpMarch {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+.wi-blueprint[data-motion="full"] .wbp-cross path,
+.wi-blueprint[data-motion="full"] .wbp-dot {
+  animation: wiTwinkle 2.8s ease-in-out infinite;
+}
+
+.wi-blueprint[data-motion="full"] .wbp-cross path:nth-of-type(2) {
+  animation-delay: -1.4s;
+}
+
+/* ------------------------------ terminal ---------------------------------- */
+
+.wi-terminal .wi-svg {
+  font-family: var(--font-mono);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, #4ade80 45%, transparent));
+}
+
+.wi-terminal .wt-row {
+  fill: #4ade80;
+  font-size: 9.5px;
+  font-weight: 700;
+  white-space: pre;
+}
+
+.wi-terminal .wt-big {
+  font-size: 11px;
+}
+
+.wi-terminal .wt-dim {
+  opacity: 0.45;
+}
+
+.wi-terminal .wt-snow,
+.wi-terminal .wt-fog {
+  fill: #86efac;
+}
+
+.wi-terminal .wt-bolt {
+  fill: #fde047;
+}
+
+.wi-terminal .wt-cursor {
+  fill: #4ade80;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.wi-terminal[data-motion="full"] .wt-cursor {
+  animation: wtBlink 1.1s steps(1) infinite;
+}
+
+.wi-terminal[data-motion="calm"] .wt-cursor {
+  animation: wtBlink 2.4s steps(1) infinite;
+}
+
+@keyframes wtBlink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.wi-terminal[data-motion="full"] .wt-rain,
+.wi-terminal[data-motion="full"] .wt-snow {
+  animation: wtRain 1.6s steps(2) infinite;
+}
+
+.wi-terminal[data-motion="calm"] .wt-rain,
+.wi-terminal[data-motion="calm"] .wt-snow {
+  animation: wtRain 3.2s steps(2) infinite;
+}
+
+@keyframes wtRain {
+  0% {
+    transform: translateY(-3px);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(4px);
+    opacity: 0;
+  }
+}
+
+.wi-terminal[data-motion="full"] .wt-bolt {
+  animation: pxFlash 3.4s steps(2) infinite;
+}
+
+.wi-terminal[data-motion="calm"] .wt-bolt {
+  animation: pxFlash 6.4s steps(2) infinite;
+}
+
+/* ---------------------------- constellation ------------------------------- */
+
+.wi-constellation .wc-line path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--brand) 55%, transparent);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.wi-constellation .wc-thin line {
+  stroke: color-mix(in srgb, var(--brand) 40%, transparent);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.wi-constellation .wc-dot {
+  fill: var(--icon-star);
+}
+
+.wi-constellation .wc-dot-big {
+  fill: var(--icon-sun);
+}
+
+.wi-constellation .wc-bolt {
+  fill: var(--icon-bolt);
+}
+
+.wi-constellation[data-motion="full"] .wc-dot {
+  animation: wiTwinkle 3s ease-in-out infinite;
+}
+
+.wi-constellation[data-motion="calm"] .wc-dot {
+  animation: wiTwinkle 6s ease-in-out infinite;
+}
+
+.wi-constellation .wc-dots .wc-dot:nth-child(2) {
+  animation-delay: -0.8s;
+}
+
+.wi-constellation .wc-dots .wc-dot:nth-child(3) {
+  animation-delay: -1.6s;
+}
+
+.wi-constellation .wc-dots .wc-dot:nth-child(4) {
+  animation-delay: -2.2s;
+}
+
+.wi-constellation[data-motion="full"] .wc-fall {
+  animation: wiFall 1.5s linear infinite;
+}
+
+.wi-constellation[data-motion="calm"] .wc-fall {
+  animation: wiFall 3s linear infinite;
+}
+
+.wi-constellation .wc-fall.wc-slow {
+  animation-duration: 3.2s;
+}
+
+.wi-constellation[data-motion="calm"] .wc-fall.wc-slow {
+  animation-duration: 6s;
+}
+
+/* ------------------------------- cutout ---------------------------------- */
+
+.wi-cutout .wp-layer {
+  filter: drop-shadow(0 2px 0 rgba(2, 8, 20, 0.22));
+}
+
+.wi-cutout .wp-ray {
+  fill: color-mix(in srgb, var(--icon-sun) 75%, transparent);
+}
+
+.wi-cutout .wp-sun {
+  fill: var(--icon-sun);
+}
+
+.wi-cutout .wp-sun-back {
+  fill: color-mix(in srgb, var(--icon-sun) 62%, #b45309);
+}
+
+.wi-cutout .wp-moon {
+  fill: var(--icon-moon);
+}
+
+.wi-cutout .wp-moon-back {
+  fill: color-mix(in srgb, var(--icon-moon) 62%, #475569);
+}
+
+.wi-cutout .wp-shade-1 {
+  fill: color-mix(in srgb, var(--icon-cloud) 88%, transparent);
+}
+
+.wi-cutout .wp-shade-2 {
+  fill: color-mix(in srgb, var(--icon-cloud) 55%, var(--brand));
+}
+
+.wi-cutout .wp-shade-3 {
+  fill: color-mix(in srgb, var(--icon-cloud) 35%, transparent);
+}
+
+.wi-cutout .wp-cloud-back {
+  opacity: 0.5;
+}
+
+.wi-cutout .wp-drop,
+.wi-cutout .wp-flake circle,
+.wi-cutout .wp-bolt {
+  fill: var(--icon-drop);
+}
+
+.wi-cutout .wp-bolt {
+  fill: var(--icon-bolt);
+}
+
+.wi-cutout .wp-fog .wp-layer {
+  fill: var(--icon-cloud);
+  opacity: 0.75;
+}
+
+.wi-cutout[data-motion="full"] .wp-cloud .wp-layer,
+.wi-cutout[data-motion="full"] .wp-sun,
+.wi-cutout[data-motion="full"] .wp-moon {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: wpDrift 5s ease-in-out infinite;
+}
+
+.wi-cutout[data-motion="calm"] .wp-cloud .wp-layer,
+.wi-cutout[data-motion="calm"] .wp-sun,
+.wi-cutout[data-motion="calm"] .wp-moon {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: wpDrift 9.5s ease-in-out infinite;
+}
+
+.wi-cutout .wp-shade-2,
+.wi-cutout .wp-moon-back,
+.wi-cutout .wp-sun-back {
+  animation-delay: -2.5s;
+}
+
+@keyframes wpDrift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(0.8px, -1.2px);
+  }
+}
+
+.wi-cutout[data-motion="full"] .wp-drop,
+.wi-cutout[data-motion="full"] .wp-flake {
+  animation: wiFall 1.35s linear infinite;
+}
+
+.wi-cutout[data-motion="calm"] .wp-drop,
+.wi-cutout[data-motion="calm"] .wp-flake {
+  animation: wiFall 2.7s linear infinite;
+}
+
+/* ------------------------------ etching ----------------------------------- */
+
+.wi-etching .wg-hatch line {
+  stroke: currentColor;
+  stroke-width: 1.35;
+}
+
+.wi-etching .wg-ring line,
+.wi-etching .wg-thin line,
+.wi-etching .wg-rain line,
+.wi-etching .wg-bolt,
+.wi-etching .wg-rain circle,
+.wi-etching .wg-star path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.wi-etching .wg-bolt {
+  stroke-width: 1.8;
+}
+
+.wi-etching .wg-thin line {
+  stroke-width: 1.2;
+  opacity: 0.75;
+}
+
+.wi-etching .wg-star path {
+  fill: currentColor;
+  stroke: none;
+  opacity: 0.9;
+}
+
+.wi-etching {
+  opacity: 0.88;
+}
+
+.wi-etching[data-motion="full"] .wg-hatch {
+  animation: wgRoll 7s linear infinite;
+}
+
+.wi-etching[data-motion="calm"] .wg-hatch {
+  animation: wgRoll 14s linear infinite;
+}
+
+@keyframes wgRoll {
+  to {
+    transform: translateY(-3.4px);
+  }
+}
+
+.wi-etching[data-motion="full"] .wg-rain line,
+.wi-etching[data-motion="full"] .wg-rain circle {
+  animation: wiFall 1.3s linear infinite;
+}
+
+.wi-etching[data-motion="calm"] .wg-rain line,
+.wi-etching[data-motion="calm"] .wg-rain circle {
+  animation: wiFall 2.6s linear infinite;
+}
+
+.wi-etching[data-motion="full"] .wg-ring {
+  transform-origin: 32px 30px;
+  transform-box: view-box;
+  animation: wiSpin 40s linear infinite;
+}
+
+/* ------------------------------ hologram ---------------------------------- */
+
+.wi-hologram .wh-rays line {
+  stroke: color-mix(in srgb, #a78bfa 80%, transparent);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.wi-hologram .wh-dot {
+  fill: #e9d5ff;
+}
+
+.wi-hologram .wh-thin line {
+  stroke: color-mix(in srgb, #22d3ee 55%, transparent);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.wi-hologram .wh-drop {
+  fill: #22d3ee;
+}
+
+.wi-hologram .wh-shine {
+  opacity: 0.55;
+}
+
+.wi-hologram[data-motion="full"] .wh-shine {
+  animation: whSweep 3.8s ease-in-out infinite;
+}
+
+.wi-hologram[data-motion="calm"] .wh-shine {
+  animation: whSweep 7.5s ease-in-out infinite;
+}
+
+@keyframes whSweep {
+  0%,
+  100% {
+    transform: translateX(-6px);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translateX(6px);
+    opacity: 0.75;
+  }
+}
+
+.wi-hologram[data-motion="full"] .wh-rays {
+  transform-origin: 32px 30px;
+  transform-box: view-box;
+  animation: wiSpin 24s linear infinite;
+}
+
+.wi-hologram[data-motion="calm"] .wh-rays {
+  transform-origin: 32px 30px;
+  transform-box: view-box;
+  animation: wiSpin 84s linear infinite;
+}
+
+.wi-hologram[data-motion="full"] .wh-rain .wh-drop {
+  animation: wiFall 1.25s linear infinite;
+}
+
+.wi-hologram[data-motion="calm"] .wh-rain .wh-drop {
+  animation: wiFall 2.5s linear infinite;
+}
+
+/* -------------------------------- badge ----------------------------------- */
+
+.wi-badge .wd-disc {
+  fill: var(--brand);
+}
+
+.wi-badge .wd-rim {
+  fill: none;
+  stroke: color-mix(in srgb, #ffffff 45%, transparent);
+  stroke-width: 1.6;
+}
+
+.wi-badge[data-motion="full"] .wd-disc {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: wdTilt 4.6s ease-in-out infinite;
+}
+
+.wi-badge[data-motion="calm"] .wd-disc {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: wdTilt 9s ease-in-out infinite;
+}
+
+@keyframes wdTilt {
+  0%,
+  100% {
+    transform: rotate(-2.2deg) scale(1);
+  }
+  50% {
+    transform: rotate(2.2deg) scale(1.02);
+  }
+}
+
+/* -------------------------------- glitch ---------------------------------- */
+
+.wi-glitch .wq-main {
+  fill: var(--text);
+}
+
+.wi-glitch .wq-main-thin :is(circle, path, line) {
+  fill: var(--text);
+}
+
+.wi-glitch .wq-main .wq-main-thin {
+  fill: none;
+}
+
+.wi-glitch .wq-main-thin :is(line) {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.wi-glitch .wq-main-thin :is(circle) {
+  fill: var(--text);
+}
+
+.wi-glitch .wq-main-thin > path {
+  fill: color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+.wi-glitch .wq-bolt {
+  fill: var(--text);
+}
+
+.wi-glitch .wq-ghost-r {
+  fill: #fb7185;
+}
+
+.wi-glitch .wq-ghost-c {
+  fill: #22d3ee;
+}
+
+.wi-glitch .wq-ghost {
+  opacity: 0.75;
+}
+
+.wi-glitch[data-motion="full"] .wq-ghost-r {
+  animation: wqJitter 2.4s steps(2) infinite;
+}
+
+.wi-glitch[data-motion="full"] .wq-ghost-c {
+  animation: wqJitter 2.4s steps(2) infinite reverse;
+}
+
+.wi-glitch[data-motion="calm"] .wq-ghost-r {
+  animation: wqJitter 5s steps(2) infinite;
+}
+
+.wi-glitch[data-motion="calm"] .wq-ghost-c {
+  animation: wqJitter 5s steps(2) infinite reverse;
+}
+
+@keyframes wqJitter {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.75;
+  }
+  25% {
+    transform: translateX(-0.8px);
+    opacity: 0.45;
+  }
+  60% {
+    transform: translateX(0.9px);
+    opacity: 0.85;
+  }
+}
+
+.wi-glitch[data-motion="full"] .wq-rain line,
+.wi-glitch[data-motion="full"] .wq-rain circle {
+  animation: wiFall 1.3s linear infinite;
 }
 
 /* ------------------------------- emoji ---------------------------------- */
@@ -1068,6 +1734,42 @@
   animation: wiTwinkle 3.2s ease-in-out infinite;
 }
 
+.wi-svgpack[data-motion="calm"] .wi-stars circle {
+  animation: wiTwinkle 6.5s ease-in-out infinite;
+}
+
+.wi-svgpack[data-motion="full"] .wi-fog line {
+  animation: wiDrift 5.5s ease-in-out infinite;
+}
+
+.wi-svgpack[data-motion="calm"] .wi-fog line {
+  animation: wiDrift 11s ease-in-out infinite;
+}
+
+.wi-svgpack .wi-fog line:nth-child(2) {
+  animation-delay: -1.8s;
+}
+
+.wi-svgpack .wi-fog line:nth-child(3) {
+  animation-delay: -3.6s;
+}
+
+.wi-svgpack[data-motion="full"] .wi-hail circle {
+  animation: wiHail 1.6s linear infinite;
+}
+
+.wi-svgpack[data-motion="calm"] .wi-hail circle {
+  animation: wiHail 3.2s linear infinite;
+}
+
+.wi-svgpack .wi-hail circle:nth-child(2) {
+  animation-delay: -0.55s;
+}
+
+.wi-svgpack .wi-hail circle:nth-child(3) {
+  animation-delay: -1.1s;
+}
+
 .wi-svgpack[data-motion="off"] *,
 .wi[data-motion="off"] * {
   animation: none !important;
@@ -1143,6 +1845,30 @@
   }
 }
 
+@keyframes wiDrift {
+  0%,
+  100% {
+    transform: translateX(-1.6px);
+  }
+  50% {
+    transform: translateX(1.6px);
+  }
+}
+
+@keyframes wiHail {
+  0% {
+    transform: translateY(-2px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(3px);
+    opacity: 0;
+  }
+}
+
 /* --------------------------- reduced motion ----------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1158,8 +1884,7 @@
   /* The app has its own motion switch; an explicit "full" wins over the OS
      preference, so a static icon means the switch is set to calm or off. */
   .wi-svgpack[data-motion="calm"] *,
-  .wi-emoji[data-motion="calm"] *,
-  .wi-pixel[data-motion="calm"] * {
+  .wi-emoji[data-motion="calm"] * {
     animation: none !important;
   }
 }

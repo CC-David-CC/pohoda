@@ -26,6 +26,7 @@ function Shell() {
   const [tab, setTab] = useState<TabId>("today");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [placeOpen, setPlaceOpen] = useState(false);
+  const [placesOpen, setPlacesOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; tone: "ok" | "error" } | null>(null);
 
   const providerName = useMemo(() => {
@@ -36,6 +37,14 @@ function Shell() {
 
   const showError = Boolean(error) && !data;
   const stale = Boolean(error) && Boolean(data);
+
+  // Offline shell: register the service worker in production builds only, so
+  // it never fights the dev server's live reload.
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") return;
+    if (!("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!data) return;
@@ -91,21 +100,66 @@ function Shell() {
             </span>
           </div>
 
-          <button
-            type="button"
-            className="place-pill"
-            onClick={() => setPlaceOpen(true)}
-            aria-label={t("header.place")}
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z" />
-              <circle cx="12" cy="10" r="2.6" />
-            </svg>
-            <span className="place-name">{data?.place.name ?? prefs.place.name}</span>
-            <svg className="pill-caret" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </button>
+          <div className="place-wrap">
+            <button
+              type="button"
+              className="place-pill"
+              onClick={() => setPlacesOpen((open) => !open)}
+              aria-expanded={placesOpen}
+              aria-label={t("header.place")}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z" />
+                <circle cx="12" cy="10" r="2.6" />
+              </svg>
+              <span className="place-name">{data?.place.name ?? prefs.place.name}</span>
+              <svg className="pill-caret" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            {placesOpen ? (
+              <>
+                <button
+                  type="button"
+                  className="menu-backdrop"
+                  aria-hidden="true"
+                  tabIndex={-1}
+                  onClick={() => setPlacesOpen(false)}
+                />
+                <div className="place-menu" role="menu" aria-label={t("header.place")}>
+                  {prefs.places.map((place) => {
+                    const active = place.id === (data?.place.id ?? prefs.place.id);
+                    return (
+                      <button
+                        key={place.id}
+                        type="button"
+                        role="menuitem"
+                        className={active ? "place-item is-active" : "place-item"}
+                        onClick={() => {
+                          onSelectPlace(place);
+                          setPlacesOpen(false);
+                        }}
+                      >
+                        {placeLabel(place)}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="place-item place-more"
+                    onClick={() => {
+                      setPlacesOpen(false);
+                      setPlaceOpen(true);
+                    }}
+                  >
+                    {t("header.place")}
+                  </button>
+                </div>
+              </>
+            ) : null}
+          </div>
 
           <nav className="tabs" role="tablist" aria-label={t("a11y.tabs")}>
             {TABS.map((id) => (

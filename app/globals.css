@@ -597,6 +597,315 @@
   --icon-sun: #fdba74;
 }
 
+/* ------------------------------- styles ----------------------------------
+   Design-language layer on top of colour themes (html[data-style], see
+   lib/style). A theme changes colours; a style changes the whole look:
+   surfaces, corners, shadows, glows and the background treatment. Rules
+   below must stay after the [data-theme] blocks: same specificity, so source
+   order wins. Styles that don't bring their own palette derive everything
+   from theme tokens, so they combine with any theme.
+   ------------------------------------------------------------------------- */
+
+/* liquid-glass — the default Pohoda look: translucent surfaces, blurred
+   backdrop and a specular highlight along the top edge. */
+[data-style="liquid-glass"] .card {
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), var(--shadow);
+}
+
+/* flat — solid colour blocks, hard edges, no shadows and no blur. */
+[data-style="flat"] {
+  --radius: 10px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --surface: var(--surface-solid);
+  --surface-2: color-mix(in srgb, var(--surface-solid) 85%, var(--bg));
+  --border: var(--border-strong);
+  --shadow: none;
+}
+
+[data-style="flat"] .card,
+[data-style="flat"] .modal-backdrop {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* skeuomorphism — bevelled, embossed surfaces: top highlight, bottom inner
+   shadow and a soft drop, like a physical panel. */
+[data-style="skeuomorphism"] {
+  --radius: 12px;
+  --radius-sm: 9px;
+  --radius-xs: 7px;
+  --surface: color-mix(in srgb, var(--surface-solid) 96%, transparent);
+  --surface-2: color-mix(in srgb, var(--surface-solid) 90%, transparent);
+  --shadow: 0 10px 26px -12px rgba(0, 0, 0, 0.5);
+}
+
+[data-style="skeuomorphism"] .card {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-solid) 94%, #ffffff) 0%,
+    var(--surface-solid) 34%,
+    color-mix(in srgb, var(--surface-solid) 93%, #000000) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.18),
+    var(--shadow);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* aurora — a dark look with a northern-lights wash of green, cyan and violet
+   behind translucent cards. Brings its own palette. */
+[data-style="aurora"] {
+  color-scheme: dark;
+  --bg: #051014;
+  --surface: rgba(13, 32, 38, 0.62);
+  --surface-2: rgba(13, 32, 38, 0.44);
+  --surface-solid: #0d2026;
+  --border: rgba(148, 233, 215, 0.14);
+  --border-strong: rgba(148, 233, 215, 0.26);
+  --text: #e8fbf5;
+  --muted: #8fb8b6;
+  --muted-2: #6b938f;
+  --brand: #34d399;
+  --brand-2: #22d3ee;
+  --brand-soft: rgba(52, 211, 153, 0.15);
+  --on-brand: #04120f;
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.13);
+  --ok: #34d399;
+  --ring: rgba(52, 211, 153, 0.5);
+  --shadow: 0 26px 70px -38px rgba(0, 0, 0, 0.85);
+  --sky-day-1: #0a2a30;
+  --sky-day-2: #12424a;
+  --sky-day-3: #1b5f66;
+  --sky-night-1: #04141a;
+  --sky-night-2: #0a2a30;
+  --sky-night-3: #103f46;
+  --cloud: rgba(167, 243, 208, 0.24);
+  --icon-moon: #d1fae5;
+  --icon-cloud: #a7f3d0;
+  --icon-drop: #67e8f9;
+  --icon-bolt: #fbbf24;
+  --icon-star: #d1fae5;
+  --icon-sun: #6ee7b7;
+}
+
+[data-style="aurora"] body {
+  background:
+    radial-gradient(900px 520px at 12% -8%, rgba(52, 211, 153, 0.2), transparent 60%),
+    radial-gradient(800px 480px at 88% 4%, rgba(34, 211, 238, 0.16), transparent 62%),
+    radial-gradient(760px 520px at 50% 108%, rgba(167, 139, 250, 0.16), transparent 65%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* neon — dark surfaces outlined and lit by the accent glow. */
+[data-style="neon"] {
+  color-scheme: dark;
+  --bg: #050510;
+  --surface: rgba(12, 12, 28, 0.68);
+  --surface-2: rgba(12, 12, 28, 0.48);
+  --surface-solid: #0c0c1c;
+  --border: color-mix(in srgb, var(--brand) 45%, transparent);
+  --border-strong: color-mix(in srgb, var(--brand) 70%, transparent);
+  --text: #f2f2ff;
+  --muted: #9d9dc4;
+  --muted-2: #73739c;
+  --brand: #e879f9;
+  --brand-2: #22d3ee;
+  --brand-soft: rgba(232, 121, 249, 0.16);
+  --on-brand: #14041a;
+  --warn: #fde047;
+  --warn-soft: rgba(253, 224, 71, 0.14);
+  --ok: #4ade80;
+  --ring: rgba(232, 121, 249, 0.55);
+  --shadow: 0 0 34px -6px rgba(232, 121, 249, 0.35);
+  --sky-day-1: #1a0b2e;
+  --sky-day-2: #2b1152;
+  --sky-day-3: #3d1a75;
+  --sky-night-1: #0d0518;
+  --sky-night-2: #180a30;
+  --sky-night-3: #241048;
+  --cloud: rgba(240, 171, 252, 0.25);
+  --icon-moon: #f5d0fe;
+  --icon-cloud: #f0abfc;
+  --icon-drop: #67e8f9;
+  --icon-bolt: #fde047;
+  --icon-star: #f5d0fe;
+  --icon-sun: #fde047;
+}
+
+[data-style="neon"] body {
+  background:
+    radial-gradient(1000px 560px at 50% -260px, rgba(232, 121, 249, 0.16), transparent 65%),
+    radial-gradient(800px 460px at 100% 100%, rgba(34, 211, 238, 0.12), transparent 62%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+[data-style="neon"] .card {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--brand) 22%, transparent),
+    0 0 28px -8px color-mix(in srgb, var(--brand) 55%, transparent),
+    var(--shadow);
+}
+
+/* brutalism — raw blocks: zero radius, thick high-contrast borders and a hard
+   offset shadow. Adapts to the theme's text colour. */
+[data-style="brutalism"] {
+  --radius: 0px;
+  --radius-sm: 0px;
+  --radius-xs: 0px;
+  --surface: var(--surface-solid);
+  --surface-2: color-mix(in srgb, var(--surface-solid) 88%, var(--bg));
+  --border: color-mix(in srgb, var(--text) 80%, transparent);
+  --border-strong: var(--text);
+  --shadow: 6px 6px 0 0 color-mix(in srgb, var(--text) 85%, transparent);
+}
+
+[data-style="brutalism"] .card {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* claymorphism — puffy soft bodies: big radius, inner light and shadow like
+   moulded clay. */
+[data-style="claymorphism"] {
+  --radius: 28px;
+  --radius-sm: 22px;
+  --radius-xs: 16px;
+  --surface: color-mix(in srgb, var(--surface-solid) 88%, transparent);
+  --surface-2: color-mix(in srgb, var(--surface-solid) 76%, transparent);
+  --shadow: 0 22px 50px -24px rgba(0, 0, 0, 0.45);
+}
+
+[data-style="claymorphism"] .card {
+  box-shadow:
+    inset 2px 2px 6px rgba(255, 255, 255, 0.22),
+    inset -3px -3px 8px rgba(0, 0, 0, 0.1),
+    var(--shadow);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* vaporwave — retro-eighties night: magenta and cyan over deep violet, with a
+   pink retro sun. Brings its own palette. */
+[data-style="vaporwave"] {
+  color-scheme: dark;
+  --bg: #12081f;
+  --surface: rgba(30, 16, 51, 0.68);
+  --surface-2: rgba(30, 16, 51, 0.48);
+  --surface-solid: #1e1033;
+  --border: rgba(233, 121, 249, 0.22);
+  --border-strong: rgba(34, 211, 238, 0.35);
+  --text: #f5ecff;
+  --muted: #b39ddb;
+  --muted-2: #8a76b3;
+  --brand: #e879f9;
+  --brand-2: #22d3ee;
+  --brand-soft: rgba(232, 121, 249, 0.16);
+  --on-brand: #1c0524;
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.13);
+  --ok: #34d399;
+  --ring: rgba(232, 121, 249, 0.5);
+  --shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.8);
+  --sky-day-1: #241040;
+  --sky-day-2: #38175f;
+  --sky-day-3: #4d2080;
+  --sky-night-1: #120820;
+  --sky-night-2: #1e1038;
+  --sky-night-3: #2b1752;
+  --cloud: rgba(240, 171, 252, 0.22);
+  --icon-moon: #f5d0fe;
+  --icon-cloud: #f0abfc;
+  --icon-drop: #67e8f9;
+  --icon-bolt: #fde047;
+  --icon-star: #f5d0fe;
+  --icon-sun: #fb7185;
+}
+
+[data-style="vaporwave"] body {
+  background:
+    radial-gradient(900px 500px at 18% -10%, rgba(232, 121, 249, 0.18), transparent 60%),
+    radial-gradient(900px 520px at 85% 110%, rgba(34, 211, 238, 0.16), transparent 62%),
+    linear-gradient(180deg, rgba(236, 72, 153, 0.08), transparent 30%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* minimalism — quiet monochrome structure: hairline borders, no shadows, no
+   blur, small radius. */
+[data-style="minimalism"] {
+  --radius: 12px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+  --surface: color-mix(in srgb, var(--surface-solid) 94%, transparent);
+  --surface-2: color-mix(in srgb, var(--surface-solid) 88%, transparent);
+  --border: color-mix(in srgb, var(--text) 10%, transparent);
+  --border-strong: color-mix(in srgb, var(--text) 18%, transparent);
+  --shadow: none;
+}
+
+[data-style="minimalism"] .card {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* aurora, neon and vaporwave are dark looks: keep the week-chart rain colour
+   readable when a light theme is active underneath. */
+[data-scheme="light"][data-style="aurora"] .wc-rain,
+[data-scheme="light"][data-style="neon"] .wc-rain,
+[data-scheme="light"][data-style="vaporwave"] .wc-rain {
+  color: #8ab4ff;
+}
+
+/* ------------------------------- fonts -----------------------------------
+   Interface typefaces (html[data-font], see lib/font). All stacks resolve to
+   fonts already installed on the device, so switching is instant and works
+   offline. The default "system" stack lives on :root — no block needed.
+   ------------------------------------------------------------------------- */
+
+[data-font="grotesk"] {
+  --font-sans: "Helvetica Neue", Helvetica, Roboto, Arial, "Liberation Sans", sans-serif;
+}
+
+[data-font="geometric"] {
+  --font-sans: "Century Gothic", "Avenir Next", Futura, "URW Gothic", "Trebuchet MS", sans-serif;
+}
+
+[data-font="humanist"] {
+  --font-sans: "Gill Sans", "Gill Sans MT", Optima, Calibri, Candara, "Segoe UI", sans-serif;
+}
+
+[data-font="rounded"] {
+  --font-sans: "Trebuchet MS", "Segoe UI", Verdana, Tahoma, sans-serif;
+}
+
+[data-font="serif"] {
+  --font-sans: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", "Noto Serif", serif;
+}
+
+[data-font="elegant"] {
+  --font-sans: "Bodoni MT", Didot, "Bodoni 72", "Playfair Display", Georgia, serif;
+}
+
+[data-font="slab"] {
+  --font-sans: Rockwell, "Rockwell Nova", "Roboto Slab", "Josefin Slab", Georgia, serif;
+}
+
+[data-font="condensed"] {
+  --font-sans: "Bahnschrift", "Arial Narrow", "Roboto Condensed", "Helvetica Neue", Arial, sans-serif;
+}
+
+[data-font="mono"] {
+  --font-sans: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
 /* -------------------------------- base ---------------------------------- */
 
 *,
@@ -812,6 +1121,122 @@ svg {
   width: 13px;
   height: 13px;
   stroke: var(--muted);
+}
+
+/* Quick place switcher: a small menu under the header pill. */
+.place-wrap {
+  position: relative;
+}
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 29;
+  background: transparent;
+  border: 0;
+  cursor: default;
+}
+
+.place-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  min-width: 210px;
+  max-width: 280px;
+  display: grid;
+  padding: 6px;
+  gap: 2px;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+
+.place-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 11px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.place-item:hover {
+  background: var(--surface-2);
+}
+
+.place-item.is-active {
+  color: var(--brand);
+}
+
+.place-item.place-more {
+  color: var(--muted);
+  font-weight: 500;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-xs) var(--radius-xs);
+}
+
+/* Weather warnings: an amber strip above the hero. */
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  margin-bottom: 14px;
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--warn-soft);
+  color: var(--text);
+}
+
+.alert-banner svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: var(--warn);
+  stroke: var(--warn);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.alert-banner svg path:last-child {
+  fill: none;
+}
+
+.alert-banner ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.alert-close {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.alert-close:hover {
+  color: var(--text);
+  background: var(--surface-2);
 }
 
 .tabs {
@@ -1312,6 +1737,19 @@ svg {
 .hour-rain.is-dry {
   color: var(--muted-2);
   font-weight: 500;
+}
+
+/* Probability bar under each hour: taller means a wetter hour. */
+.hour-prob {
+  width: 26px;
+  min-height: 6px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--icon-drop) 55%, transparent);
+  align-self: center;
+}
+
+.hour-prob:has(+ .hour-rain.is-dry) {
+  background: color-mix(in srgb, var(--muted-2) 30%, transparent);
 }
 
 /* ------------------------------- details -------------------------------- */
@@ -2197,145 +2635,9 @@ svg {
   margin: 0 0 8px;
 }
 
-.custom-theme-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.custom-theme-field {
-  display: grid;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.custom-theme-field input[type="color"] {
-  width: 100%;
-  height: 40px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-solid);
-  cursor: pointer;
-  padding: 2px;
-}
-
-.custom-theme-field code {
-  font-size: 11px;
-  color: var(--muted-2);
-}
-
-.custom-theme-preview {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  min-height: 60px;
-  font-weight: 600;
-}
-
-.custom-theme-preview span:last-child {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  margin-left: auto;
-}
-
-.custom-color-row {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  gap: 8px;
-  align-items: center;
-}
-
-.custom-hex {
-  width: 100%;
-  height: 40px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-solid);
-  color: var(--text);
-  padding: 0 10px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 13px;
-}
-
-.custom-theme-name-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 8px;
-  margin-bottom: 12px;
-  align-items: center;
-}
-
-.custom-name-input {
-  height: 40px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-solid);
-  color: var(--text);
-  padding: 0 12px;
-  font-size: 14px;
-}
-
 .btn-sm {
   padding: 6px 10px;
   font-size: 12px;
-}
-
-.saved-themes {
-  margin-top: 14px;
-  display: grid;
-  gap: 8px;
-}
-
-.saved-themes-title {
-  margin: 0 0 4px;
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.saved-theme-row {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  gap: 10px;
-  align-items: center;
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface-2);
-}
-
-.saved-theme-swatch {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  border: 2px solid;
-  position: relative;
-  overflow: hidden;
-}
-
-.saved-theme-swatch > span {
-  position: absolute;
-  inset: 6px;
-  border-radius: 6px;
-}
-
-.saved-theme-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.saved-theme-actions {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
 }
 
 .place-current {
@@ -2487,6 +2789,30 @@ input[type="search"] {
 
 input[type="text"]:focus,
 input[type="search"]:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+/* Style picker — a plain dropdown like the SmartESS settings. */
+.style-select {
+  width: 100%;
+  padding: 10px 34px 10px 12px;
+  border-radius: 11px;
+  border: 1px solid var(--border-strong);
+  background:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%) calc(100% - 17px) 50% / 5px 5px,
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%) calc(100% - 12px) 50% / 5px 5px,
+    var(--surface-solid);
+  background-repeat: no-repeat;
+  color: var(--text);
+  font-size: 0.86rem;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+
+.style-select:focus {
   outline: none;
   border-color: var(--brand);
   box-shadow: 0 0 0 3px var(--brand-soft);
@@ -3240,77 +3566,385 @@ input[type="search"]:focus {
   color: var(--muted);
 }
 
+.wind-art svg {
+  overflow: hidden;
+}
+
 .wind-ground {
   stroke: var(--border-strong);
   stroke-width: 1.4;
   stroke-linecap: round;
 }
 
+/* The lawn: a narrow mound with dense grass. Turns into a snowdrift when snow
+   lies on the ground (winter, early spring or a fresh snowfall). */
+.wind-mound {
+  fill: var(--wind-mound, #4f9a44);
+  transition: fill 1.2s ease;
+}
+
 .wind-trunk {
   fill: #7a5230;
 }
 
+.wind-branch {
+  fill: none;
+  stroke: #7a5230;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.wind-chips {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* --------------------------- season palette ------------------------------ */
+
+.wind-card {
+  --wind-mound: #4f9a44;
+  --crown-a1: #5aa64b;
+  --crown-a2: #6fbb5a;
+  --crown-a3: #4c9440;
+  --crown-a4: #63b052;
+  --crown-b1: #7cc45f;
+  --crown-b2: #8ed471;
+}
+
+.wind-card[data-season="spring"] {
+  --wind-mound: #5fae4e;
+  --crown-a1: #74c55e;
+  --crown-a2: #8ed471;
+  --crown-a3: #63b052;
+  --crown-a4: #7cc45f;
+  --crown-b1: #8ed471;
+  --crown-b2: #a5e084;
+}
+
+.wind-card[data-season="autumn"] {
+  --wind-mound: #8fa04b;
+  --crown-a1: #c9903f;
+  --crown-a2: #d9a94f;
+  --crown-a3: #b3742f;
+  --crown-a4: #cf9c46;
+  --crown-b1: #c9a04b;
+  --crown-b2: #d9b45f;
+}
+
+/* Bare trees in winter and early spring: muted palette, no foliage. */
+.wind-card[data-leafless="true"] {
+  --wind-mound: #e8f0f8;
+  --crown-a1: #5b7a62;
+  --crown-a2: #6d8a70;
+  --crown-a3: #4e6b55;
+  --crown-a4: #64816a;
+  --crown-b1: #6d8a70;
+  --crown-b2: #7d9a7e;
+}
+
+/* Fresh snowfall whitens the lawn even while the crowns are still up. */
+.wind-card[data-snowy="true"] {
+  --wind-mound: #e8f0f8;
+}
+
+/* ------------------------------ trees ------------------------------------ */
+/* Three species. Each has its own sway amplitude, period and lean factor:
+   the fir is stiff and bends the least, the small broadleaf is the liveliest. */
+
+.wind-tree {
+  animation: treeSway calc(var(--wind-duration, 3.6s) * var(--tree-dur, 1)) ease-in-out
+    infinite alternate;
+}
+
+.wind-tree-fir {
+  --tree-sway: 0.65;
+  --tree-dur: 1.25;
+  transform-origin: 52px 146px;
+}
+
+.wind-tree-big {
+  --tree-sway: 1;
+  --tree-dur: 1;
+  transform-origin: 108px 146px;
+}
+
+.wind-tree-small {
+  --tree-sway: 1.2;
+  --tree-dur: 0.88;
+  transform-origin: 160px 146px;
+}
+
+/* Static downwind tilt, driven by the live wind speed and direction. */
+.wind-lean {
+  transform: rotate(calc(var(--wind-lean, 0deg) * var(--lean-mul, 1)));
+}
+
+.wind-lean-fir {
+  --lean-mul: 0.7;
+  transform-origin: 52px 146px;
+}
+
+.wind-lean-big {
+  --lean-mul: 1;
+  transform-origin: 108px 146px;
+}
+
+.wind-lean-small {
+  --lean-mul: 1.15;
+  transform-origin: 160px 146px;
+}
+
+.wind-tree-fir .wind-fir-t1 {
+  fill: #35754d;
+}
+
+.wind-tree-fir .wind-fir-t2 {
+  fill: #2f6b46;
+}
+
+.wind-tree-fir .wind-fir-t3 {
+  fill: #2a5f40;
+}
+
 .wind-crown ellipse {
-  fill: #5aa64b;
+  fill: var(--crown-a1);
 }
 
 .wind-crown ellipse:nth-child(2) {
-  fill: #6fbb5a;
+  fill: var(--crown-a2);
 }
 
 .wind-crown ellipse:nth-child(3) {
-  fill: #4c9440;
+  fill: var(--crown-a3);
 }
 
 .wind-crown ellipse:nth-child(4) {
-  fill: #63b052;
+  fill: var(--crown-a4);
 }
 
-.wind-tree {
-  transform-origin: 82px 146px;
-  animation: treeSway var(--wind-duration, 3.6s) ease-in-out infinite alternate;
+.wind-crown-b ellipse {
+  fill: var(--crown-b1);
+}
+
+.wind-crown-b ellipse:nth-child(2),
+.wind-crown-b ellipse:nth-child(3) {
+  fill: var(--crown-b2);
+}
+
+.wind-crown-b ellipse:nth-child(4) {
+  fill: var(--crown-b1);
+}
+
+/* Bare broadleaf trees in winter and early spring. */
+.wind-bare {
+  display: none;
+}
+
+.wind-card[data-leafless="true"] .wind-bare {
+  display: block;
+}
+
+.wind-card[data-leafless="true"] .wind-crown,
+.wind-card[data-leafless="true"] .wind-crown-snow,
+.wind-card[data-leafless="true"] .wind-leaves {
+  display: none;
 }
 
 .wind-crown {
-  transform-origin: 82px 108px;
+  transform-origin: 50% 100%;
+  transform-box: fill-box;
   animation: crownSway calc(var(--wind-duration, 3.6s) * 0.72) ease-in-out infinite alternate;
+}
+
+/* Snow settles wherever it can: crowns while they are up, branch tips once
+   the trees are bare, and every fir tier all year round. */
+.wind-crown-snow ellipse,
+.wind-branch-snow ellipse,
+.wind-fir-snow ellipse {
+  fill: #eef4fb;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.wind-card[data-snowy="true"] .wind-crown-snow ellipse,
+.wind-card[data-snowy="true"] .wind-branch-snow ellipse,
+.wind-card[data-snowy="true"] .wind-fir-snow ellipse {
+  opacity: 0.95;
+}
+
+/* Muted grass poking through the snow. */
+.wind-card[data-snowy="true"] .wind-grass path {
+  stroke: #93a89a !important;
 }
 
 .wind-grass path {
   fill: none;
   stroke: #69b455;
-  stroke-width: 2.2;
+  stroke-width: 2;
   stroke-linecap: round;
   transform-origin: bottom;
+  transform-box: fill-box;
   animation: grassSway var(--wind-duration, 3.6s) ease-in-out infinite alternate;
 }
 
-.wind-grass path:nth-child(2) {
-  animation-delay: -0.4s;
+/* ------------------------------- sky -------------------------------------- */
+/* The upper scene follows the live weather kind (data-kind, data-day). */
+
+.wind-sky-sun,
+.wind-sky-moon,
+.wind-sky-clouds,
+.wind-sky-fog,
+.wind-sky-bolt,
+.wind-veil,
+.wind-rainf,
+.wind-snowf,
+.wind-hailf {
+  display: none;
 }
 
-.wind-grass path:nth-child(3) {
-  animation-delay: -0.9s;
+.wind-sky-sun circle {
+  fill: var(--icon-sun);
 }
 
-.wind-grass path:nth-child(4) {
-  animation-delay: -0.2s;
+.wind-sky-rays line {
+  stroke: var(--icon-sun);
+  stroke-width: 2;
+  stroke-linecap: round;
 }
 
-.wind-grass path:nth-child(5) {
-  animation-delay: -0.7s;
+.wind-sky-moon circle {
+  fill: var(--icon-moon);
 }
 
-.wind-grass path:nth-child(6) {
-  animation-delay: -1.1s;
+.wind-sky-star {
+  fill: var(--icon-star);
+}
+
+.wind-sky-cloud ellipse {
+  fill: color-mix(in srgb, var(--muted) 55%, transparent);
+}
+
+.wind-sky-cloud-b ellipse {
+  fill: color-mix(in srgb, var(--muted) 40%, transparent);
+}
+
+.wind-sky-fog rect {
+  fill: color-mix(in srgb, var(--muted) 30%, transparent);
+}
+
+.wind-veil {
+  fill: #0a1420;
+  opacity: 0.16;
+}
+
+.wind-sky-bolt {
+  fill: #fde047;
+  opacity: 0;
+}
+
+.wind-card[data-day="true"][data-kind="clear"] .wind-sky-sun,
+.wind-card[data-day="true"][data-kind="partly"] .wind-sky-sun {
+  display: block;
+}
+
+.wind-card[data-day="false"][data-kind="clear"] .wind-sky-moon {
+  display: block;
+}
+
+.wind-card[data-kind="cloudy"] .wind-sky-clouds,
+.wind-card[data-kind="overcast"] .wind-sky-clouds,
+.wind-card[data-kind="drizzle"] .wind-sky-clouds,
+.wind-card[data-kind="rain"] .wind-sky-clouds,
+.wind-card[data-kind="heavy-rain"] .wind-sky-clouds,
+.wind-card[data-kind="thunder"] .wind-sky-clouds,
+.wind-card[data-kind="hail"] .wind-sky-clouds,
+.wind-card[data-kind="snow"] .wind-sky-clouds,
+.wind-card[data-kind="sleet"] .wind-sky-clouds {
+  display: block;
+}
+
+.wind-card[data-kind="fog"] .wind-sky-fog {
+  display: block;
+}
+
+.wind-card[data-kind="rain"] .wind-veil,
+.wind-card[data-kind="heavy-rain"] .wind-veil,
+.wind-card[data-kind="thunder"] .wind-veil,
+.wind-card[data-kind="hail"] .wind-veil {
+  display: block;
+}
+
+.wind-card[data-kind="heavy-rain"] .wind-veil {
+  opacity: 0.26;
+}
+
+.wind-card[data-kind="thunder"] .wind-sky-bolt {
+  display: block;
+  animation: lightningFlash 6.5s linear infinite;
+}
+
+/* ---------------------------- precipitation ------------------------------- */
+/* Falling drops and flakes follow the live kind. Rain travels with the wind
+   (--leaf-drift) and falls faster the windier it is; the tiers add density:
+   drizzle shows the first five drops, rain ten, a downpour all fourteen. */
+
+.wind-rainf {
+  stroke: #7cc4e8;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+.wind-card[data-kind="heavy-rain"] .wind-rainf {
+  stroke: #a5d8f3;
+  stroke-width: 2;
+}
+
+.wind-snow-dot {
+  fill: #f2f7fd;
+}
+
+.wind-hailf {
+  fill: #cfe8f5;
+}
+
+.wind-card[data-kind="drizzle"] .wind-rainf[data-tier="1"],
+.wind-card[data-kind="sleet"] .wind-rainf[data-tier="1"],
+.wind-card[data-kind="rain"] .wind-rainf[data-tier="1"],
+.wind-card[data-kind="rain"] .wind-rainf[data-tier="2"],
+.wind-card[data-kind="heavy-rain"] .wind-rainf,
+.wind-card[data-kind="thunder"] .wind-rainf[data-tier="1"],
+.wind-card[data-kind="thunder"] .wind-rainf[data-tier="2"] {
+  display: block;
+}
+
+.wind-card[data-kind="snow"] .wind-snowf,
+.wind-card[data-kind="sleet"] .wind-snowf[data-tier="1"] {
+  display: block;
+}
+
+.wind-card[data-kind="hail"] .wind-hailf {
+  display: block;
+}
+
+/* ------------------------------ leaves ----------------------------------- */
+
+.wind-leaf {
+  opacity: 0;
+}
+
+.wind-leaf-blade {
+  transform-origin: center;
+  transform-box: fill-box;
 }
 
 @keyframes treeSway {
   from {
-    transform: rotate(calc(var(--wind-strength, 0.3) * -5.5deg));
+    transform: rotate(calc(var(--wind-strength, 0.3) * -5.5deg * var(--tree-sway, 1)));
   }
   to {
-    transform: rotate(calc(var(--wind-strength, 0.3) * 7deg));
+    transform: rotate(calc(var(--wind-strength, 0.3) * 7deg * var(--tree-sway, 1)));
   }
 }
 
@@ -3330,6 +3964,201 @@ input[type="search"]:focus {
   to {
     transform: skewX(calc(var(--wind-strength, 0.3) * 18deg));
   }
+}
+
+@keyframes leafDrift {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  7% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(var(--leaf-drift, 0) * var(--leaf-mul, 1) * var(--wind-flip, 1) * 1px),
+      var(--leaf-drop, 94px)
+    );
+    opacity: 0;
+  }
+}
+
+@keyframes leafFlap {
+  from {
+    transform: rotate(-26deg) translateX(-0.8px);
+  }
+  to {
+    transform: rotate(26deg) translateX(0.8px);
+  }
+}
+
+@keyframes dropFall {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(var(--leaf-drift, 0) * var(--drop-mul, 1) * var(--wind-flip, 1) * 1px),
+      156px
+    );
+    opacity: 0;
+  }
+}
+
+@keyframes lightningFlash {
+  0%,
+  91%,
+  96%,
+  100% {
+    opacity: 0;
+  }
+  92%,
+  95% {
+    opacity: 1;
+  }
+  93.5% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes windCloudDrift {
+  from {
+    transform: translateX(-5px);
+  }
+  to {
+    transform: translateX(5px);
+  }
+}
+
+/* ------------------------- wind force levels ------------------------------ */
+/* Five gradations (see windLevel). Each level tunes how lively the scene is
+   on top of the continuous --wind-* values. */
+
+.wind-card[data-wind-level="calm"] .wind-tree {
+  animation-duration: calc(var(--wind-duration, 3.6s) * var(--tree-dur, 1) * 1.4);
+}
+
+.wind-card[data-wind-level="calm"] .wind-crown {
+  animation-duration: calc(var(--wind-duration, 3.6s) * 1.05);
+}
+
+.wind-card[data-wind-level="fresh"] .wind-grass path {
+  animation-duration: calc(var(--wind-duration, 3.6s) * 0.85);
+}
+
+.wind-card[data-wind-level="gale"] .wind-tree {
+  animation-duration: calc(var(--wind-duration, 3.6s) * var(--tree-dur, 1) * 0.8);
+}
+
+.wind-card[data-wind-level="gale"] .wind-crown {
+  animation-duration: calc(var(--wind-duration, 3.6s) * 0.5);
+}
+
+.wind-card[data-wind-level="gale"] .wind-grass path {
+  animation-duration: calc(var(--wind-duration, 3.6s) * 0.7);
+}
+
+/* ----------------------------- animation states --------------------------- */
+
+.wind-card[data-motion="full"] .wind-leaf {
+  animation: leafDrift var(--leaf-dur, var(--leaf-fall-dur, 6s)) linear infinite;
+  animation-delay: var(--leaf-delay, 0s);
+}
+
+.wind-card[data-motion="full"] .wind-leaf-blade {
+  animation: leafFlap 0.9s ease-in-out infinite alternate;
+}
+
+.wind-card[data-motion="calm"] .wind-leaf {
+  animation: leafDrift calc(var(--leaf-fall-dur, 6s) * 2) linear infinite;
+  animation-delay: var(--leaf-delay, 0s);
+}
+
+.wind-card[data-motion="calm"] .wind-leaf-blade {
+  animation: leafFlap 1.8s ease-in-out infinite alternate;
+}
+
+.wind-card[data-motion="full"] .wind-rainf {
+  animation: dropFall var(--drop-dur, 4s) linear infinite;
+  animation-delay: var(--drop-delay, 0s);
+}
+
+.wind-card[data-motion="calm"] .wind-rainf {
+  animation: dropFall calc(var(--drop-dur, 4s) * 1.8) linear infinite;
+  animation-delay: var(--drop-delay, 0s);
+}
+
+.wind-card[data-motion="full"] .wind-snowf {
+  animation: dropFall var(--drop-dur, 10s) linear infinite;
+  animation-delay: var(--drop-delay, 0s);
+}
+
+.wind-card[data-motion="full"] .wind-snow-dot {
+  animation: leafFlap 2.2s ease-in-out infinite alternate;
+}
+
+.wind-card[data-motion="calm"] .wind-snowf {
+  animation: dropFall calc(var(--drop-dur, 10s) * 1.8) linear infinite;
+  animation-delay: var(--drop-delay, 0s);
+}
+
+.wind-card[data-motion="full"] .wind-hailf {
+  animation: dropFall var(--drop-dur, 3s) linear infinite;
+  animation-delay: var(--drop-delay, 0s);
+}
+
+.wind-card[data-motion="calm"] .wind-hailf {
+  animation: dropFall calc(var(--drop-dur, 3s) * 1.8) linear infinite;
+  animation-delay: var(--drop-delay, 0s);
+}
+
+.wind-card[data-motion="full"] .wind-sky-cloud {
+  animation: windCloudDrift 11s ease-in-out infinite alternate;
+}
+
+.wind-card[data-motion="full"] .wind-sky-cloud-b {
+  animation: windCloudDrift 14s ease-in-out infinite alternate-reverse;
+}
+
+.wind-card[data-motion="calm"] .wind-sky-cloud {
+  animation: windCloudDrift 22s ease-in-out infinite alternate;
+}
+
+.wind-card[data-motion="calm"] .wind-sky-cloud-b {
+  animation: windCloudDrift 28s ease-in-out infinite alternate-reverse;
+}
+
+.wind-card[data-motion="full"] .wind-sky-rays {
+  transform-origin: 36px 26px;
+  transform-box: view-box;
+  animation: wiSpin 40s linear infinite;
+}
+
+/* Smooth the scene when refreshed weather data changes the wind. */
+@property --leaf-drift {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --wind-lean {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+.wind-art {
+  transition: --leaf-drift 1.4s ease;
 }
 
 .wind-card[data-motion="off"] * {

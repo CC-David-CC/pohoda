@@ -14,13 +14,8 @@ import { PREFS_STORAGE_KEY } from "@/lib/client/storage";
 import { detectLocale, isLocale, translate, type MessageKey, type MessageVars } from "@/lib/i18n";
 import { FALLBACK_PLACE, guessPlace, samePlace } from "@/lib/places";
 import { applyTheme, detectTheme, isTheme, type ThemeId } from "@/lib/theme";
-import {
-  applyCustomTheme,
-  clearCustomTheme,
-  isCustomTheme,
-  normalizeCustomTheme,
-  normalizeSavedThemes,
-} from "@/lib/client/custom-theme";
+import { applyStyle, DEFAULT_STYLE, isStyle, type StyleId } from "@/lib/style";
+import { applyFont, DEFAULT_FONT, isFont } from "@/lib/font";
 import type {
   MotionLevel,
   Place,
@@ -28,7 +23,6 @@ import type {
   Prefs,
   PressureUnit,
   ProviderId,
-  SavedTheme,
   TemperatureUnit,
   WindUnit,
 } from "@/lib/types";
@@ -41,18 +35,19 @@ export const ICON_PACKS = [
   "clay",
   "neon",
   "glass",
-  "sticker",
-  "sketch",
-  "candy",
-  "retro",
-  "pulse",
-  "pixel",
   "emoji",
-  "glyph",
-  "meteo-fill",
-  "meteo-flat",
-  "meteo-line",
-  "meteo-mono",
+  "pixel",
+  "bubble",
+  "vivid",
+  "origami",
+  "blueprint",
+  "terminal",
+  "constellation",
+  "cutout",
+  "etching",
+  "hologram",
+  "badge",
+  "glitch",
 ] as const;
 
 export type IconPack = (typeof ICON_PACKS)[number];
@@ -73,8 +68,8 @@ export function basePrefs(): Prefs {
   return {
     locale: "en",
     theme: "daylight",
-    customTheme: null,
-    savedThemes: [],
+    style: DEFAULT_STYLE,
+    font: DEFAULT_FONT,
     iconPack: "duotone",
     provider: "open-meteo",
     place: FALLBACK_PLACE,
@@ -138,10 +133,9 @@ function normalize(input: unknown, fallback: Prefs): Prefs {
 
   return {
     locale: isLocale(raw.locale) ? raw.locale : fallback.locale,
-    theme:
-      raw.theme === "custom" ? "custom" : isTheme(raw.theme) ? raw.theme : fallback.theme,
-    customTheme: normalizeCustomTheme(raw.customTheme) ?? fallback.customTheme,
-    savedThemes: normalizeSavedThemes(raw.savedThemes),
+    theme: isTheme(raw.theme) ? raw.theme : fallback.theme,
+    style: isStyle(raw.style) ? raw.style : fallback.style,
+    font: isFont(raw.font) ? raw.font : fallback.font,
     iconPack: isIconPack(raw.iconPack) ? raw.iconPack : fallback.iconPack,
     provider: isProviderId(raw.provider) ? raw.provider : fallback.provider,
     place,
@@ -200,12 +194,9 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
     };
     const next = normalize(stored, fallback);
     setPrefs(next);
-    if (next.theme === "custom" && next.customTheme) {
-      applyCustomTheme(next.customTheme);
-    } else {
-      clearCustomTheme();
-      applyTheme(next.theme as ThemeId);
-    }
+    applyStyle(next.style as StyleId);
+    applyFont(next.font as Parameters<typeof applyFont>[0]);
+    applyTheme(next.theme as ThemeId);
     setReady(true);
   }, []);
 
@@ -216,12 +207,9 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
     } catch {
       // Storage can be full or blocked; the app still works in memory.
     }
-    if (prefs.theme === "custom" && prefs.customTheme) {
-      applyCustomTheme(prefs.customTheme);
-    } else {
-      clearCustomTheme();
-      applyTheme(prefs.theme as ThemeId);
-    }
+    applyTheme(prefs.theme as ThemeId);
+    applyStyle(prefs.style as StyleId);
+    applyFont(prefs.font as Parameters<typeof applyFont>[0]);
     if (typeof document !== "undefined") {
       document.documentElement.lang = prefs.locale;
     }
