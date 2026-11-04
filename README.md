@@ -1,10 +1,36 @@
-# Pohoda
+<div align="center">
 
-**Weather, clearly.** A calm weather app with today's conditions, hourly detail, a 7-day outlook and a 30-day view. Animated skies follow the real weather, and you can pick the provider, the colours and the icon style.
+# ☀️ Pohoda
 
-Live demo: https://pohoda-weather.vercel.app
+**Weather, clearly.**
+
+A calm weather app with today's conditions, hourly detail, a 7-day outlook and a 30-day view.
+Animated skies follow the real weather — and you pick the provider, the colours, the style and even the typeface.
+
+[![Live demo](https://img.shields.io/badge/live-pohoda--weather.vercel.app-34d399?logo=vercel&logoColor=white)](https://pohoda-weather.vercel.app)
+[![CI](https://github.com/Sokolyanskyi/pohoda-weather/actions/workflows/ci.yml/badge.svg)](https://github.com/Sokolyanskyi/pohoda-weather/actions/workflows/ci.yml)
+![Tests](https://img.shields.io/badge/tests-83%20passing-34d399)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
 
 ![Pohoda — today view](docs/desktop-today.png)
+
+<br>
+
+|   | Features |
+| --- | --- |
+| 🌦️ | **27 colour schemes** · **9 design styles** · **10 typefaces** |
+| 🎨 | **19 animated icon packs** — from hand-drawn lines to 8-bit, ASCII and glitch |
+| 💨 | **Living wind scene** — three trees, seasons, falling leaves, snow that drifts and settles |
+| 📊 | Hourly detail · 7-day ranges · 30-day outlook with climate averages |
+| 🛰️ | **10 data providers** — Open-Meteo, MET Norway, commercial APIs with your own keys |
+| 🗓️ | “This day” — today versus the same date across the last ten years |
+| 📶 | Installable PWA · offline shell · EN / UK / RU / PL / DE / ES |
+
+<br>
+
+</div>
 
 ## Why another weather app
 
