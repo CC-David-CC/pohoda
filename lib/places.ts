@@ -86,6 +86,17 @@ export const FALLBACK_PLACE: Place = {
   timezone: "Europe/Kyiv",
 };
 
+export const ATLANTA_PLACE: Place = {
+  id: "geonames:4180439",
+  name: "Atlanta",
+  admin1: "GA",
+  country: "United States",
+  countryCode: "US",
+  lat: 33.749,
+  lon: -84.38798,
+  timezone: "America/New_York",
+};
+
 /** Best guess for a first visit: a familiar city in the browser's time zone. */
 export function guessPlace(): Place {
   if (typeof Intl === "undefined") return FALLBACK_PLACE;

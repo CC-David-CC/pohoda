@@ -12,7 +12,7 @@ import {
 } from "react";
 import { useAppRuntime } from "@/lib/client/runtime";
 import { detectLocale, isLocale, translate, type MessageKey, type MessageVars } from "@/lib/i18n";
-import { FALLBACK_PLACE, guessPlace, samePlace } from "@/lib/places";
+import { ATLANTA_PLACE, FALLBACK_PLACE, guessPlace, samePlace } from "@/lib/places";
 import { applyTheme, detectTheme, isTheme, type ThemeId } from "@/lib/theme";
 import { applyStyle, DEFAULT_STYLE, isStyle, type StyleId } from "@/lib/style";
 import { applyFont, DEFAULT_FONT, isFont } from "@/lib/font";
@@ -190,7 +190,7 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
       ...basePrefs(),
       locale: detectLocale(),
       theme: detectTheme(),
-      place: guessPlace(),
+      place: runtime.embedded ? ATLANTA_PLACE : guessPlace(),
       motion: initialMotion(),
     };
     const next = normalize({ ...asRecord(stored), ...runtime.initialPrefs }, fallback);
@@ -240,10 +240,10 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
       ...basePrefs(),
       locale: detectLocale(),
       theme: detectTheme(),
-      place: guessPlace(),
+      place: runtime.embedded ? ATLANTA_PLACE : guessPlace(),
       motion: initialMotion(),
     });
-  }, []);
+  }, [runtime.embedded]);
 
   const value = useMemo<PrefsContextValue>(() => {
     return {
