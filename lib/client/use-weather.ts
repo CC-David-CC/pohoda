@@ -11,7 +11,11 @@ interface WeatherState {
   loading: boolean;
   refreshing: boolean;
   fetchedAt: number | null;
+  checkedAt: number | null;
 }
+
+const ALERT_RETRY_MS = 60_000;
+const MIN_ALERT_REFRESH_MS = 15_000;
 
 export function useWeather(prefs: Prefs, ready: boolean) {
   const runtime = useAppRuntime();
@@ -23,6 +27,7 @@ export function useWeather(prefs: Prefs, ready: boolean) {
     loading: true,
     refreshing: false,
     fetchedAt: null,
+    checkedAt: null,
   });
   const controller = useRef<AbortController | null>(null);
   const hasData = useRef(false);
@@ -48,12 +53,14 @@ export function useWeather(prefs: Prefs, ready: boolean) {
         if (!data || !data.current || !Array.isArray(data.daily) || !Array.isArray(data.hourly)) {
           throw new Error("provider_error");
         }
+        const checkedAt = Date.now();
         setState({
           data,
           error: null,
           loading: false,
           refreshing: false,
-          fetchedAt: Date.now(),
+          fetchedAt: checkedAt,
+          checkedAt,
         });
       } catch (error) {
         if (signal.aborted || controller.current !== next) return;
@@ -66,6 +73,7 @@ export function useWeather(prefs: Prefs, ready: boolean) {
           error: code,
           loading: false,
           refreshing: false,
+          checkedAt: Date.now(),
         }));
       } finally {
         if (controller.current === next) controller.current = null;
@@ -77,7 +85,7 @@ export function useWeather(prefs: Prefs, ready: boolean) {
   useEffect(() => {
     if (!ready) return;
     hasData.current = false;
-    setState({ data: null, error: null, loading: true, refreshing: false, fetchedAt: null });
+    setState({ data: null, error: null, loading: true, refreshing: false, fetchedAt: null, checkedAt: null });
     void load(false);
     return () => {
       controller.current?.abort();
@@ -85,20 +93,27 @@ export function useWeather(prefs: Prefs, ready: boolean) {
     };
   }, [load, ready]);
 
+  const { checkedAt, data, error } = state;
   useEffect(() => {
-    if (!ready) return;
-    const timer = window.setInterval(() => void load(true), REFRESH_MS);
-    const onVisible = () => {
-      if (document.visibilityState !== "visible") return;
-      const fetched = state.fetchedAt;
-      if (!fetched || Date.now() - fetched > REFRESH_MS) void load(true);
+    if (!ready || checkedAt === null) return;
+    let next = checkedAt + REFRESH_MS;
+    if (data?.provider === "nws") {
+      const validUntil = Date.parse(data.alertsValidUntil ?? "");
+      const alertCheck = !error && data.alertStatus === "current" && validUntil > checkedAt
+        ? Math.max(validUntil, checkedAt + MIN_ALERT_REFRESH_MS)
+        : checkedAt + ALERT_RETRY_MS;
+      next = Math.min(next, alertCheck);
+    }
+    const refreshIfDue = () => {
+      if (document.visibilityState === "visible" && Date.now() >= next) void load(true);
     };
-    document.addEventListener("visibilitychange", onVisible);
+    const timer = window.setTimeout(refreshIfDue, Math.max(0, next - Date.now()));
+    document.addEventListener("visibilitychange", refreshIfDue);
     return () => {
-      window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", onVisible);
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", refreshIfDue);
     };
-  }, [load, ready, state.fetchedAt]);
+  }, [load, ready, checkedAt, data, error]);
 
   const refresh = useCallback(() => void load(true), [load]);
 
