@@ -12,7 +12,7 @@ import {
 } from "react";
 import { useAppRuntime } from "@/lib/client/runtime";
 import { detectLocale, isLocale, translate, type MessageKey, type MessageVars } from "@/lib/i18n";
-import { ATLANTA_PLACE, FALLBACK_PLACE, guessPlace, samePlace } from "@/lib/places";
+import { ATLANTA_PLACE, FALLBACK_PLACE, WEBOS_DEFAULT_PLACES, guessPlace, samePlace } from "@/lib/places";
 import { applyTheme, detectTheme, isTheme, type ThemeId } from "@/lib/theme";
 import { applyStyle, DEFAULT_STYLE, isStyle, type StyleId } from "@/lib/style";
 import { applyFont, DEFAULT_FONT, isFont } from "@/lib/font";
@@ -73,7 +73,7 @@ export function basePrefs(embedded = false): Prefs {
     iconPack: "duotone",
     provider: "open-meteo",
     place: FALLBACK_PLACE,
-    places: [],
+    places: embedded ? [...WEBOS_DEFAULT_PLACES] : [],
     temperature: embedded ? "f" : "c",
     wind: "kmh",
     pressure: "hpa",
@@ -121,7 +121,7 @@ function normalize(input: unknown, fallback: Prefs): Prefs {
         .map(validPlace)
         .filter((item): item is Place => Boolean(item))
         .slice(0, 8)
-    : [];
+    : fallback.places;
 
   const keys: Partial<Record<ProviderId, string>> = {};
   const rawKeys = asRecord(raw.keys);

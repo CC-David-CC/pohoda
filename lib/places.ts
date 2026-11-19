@@ -97,6 +97,13 @@ export const ATLANTA_PLACE: Place = {
   timezone: "America/New_York",
 };
 
+export const WEBOS_DEFAULT_PLACES: Place[] = [
+  { id: "geonames:4428667", name: "Gulfport", admin1: "MS", country: "United States", countryCode: "US", lat: 30.36742, lon: -89.09282, timezone: "America/Chicago" },
+  { id: "geonames:4506008", name: "Beavercreek", admin1: "OH", country: "United States", countryCode: "US", lat: 39.70923, lon: -84.06327, timezone: "America/New_York" },
+  ATLANTA_PLACE,
+  { id: "geonames:5389489", name: "Sacramento", admin1: "CA", country: "United States", countryCode: "US", lat: 38.58157, lon: -121.4944, timezone: "America/Los_Angeles" },
+];
+
 /** Best guess for a first visit: a familiar city in the browser's time zone. */
 export function guessPlace(): Place {
   if (typeof Intl === "undefined") return FALLBACK_PLACE;
