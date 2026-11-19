@@ -9,7 +9,7 @@ export const pl = {
 
   "tab.today": "Dziś",
   "tab.week": "7 dni",
-  "tab.month": "30 dni",
+  "tab.month": "Przegląd",
 
   "header.settings": "Ustawienia",
   "header.refresh": "Odśwież prognozę",
@@ -110,7 +110,7 @@ export const pl = {
   "week.humidity": "Wilgotność",
   "week.legend": "Paski pokazują dobowy zakres temperatur, kropka — średnią.",
 
-  "month.title": "Prognoza na 30 dni",
+  "month.title": "Prognoza",
   "month.summary": "Miesiąc w skrócie",
   "month.avgHigh": "Średnia maks.",
   "month.avgLow": "Średnia min.",
@@ -224,6 +224,7 @@ export const pl = {
   "error.geoUnsupported": "Ta przeglądarka nie obsługuje geolokalizacji.",
   "error.unknown": "Nieoczekiwany błąd. Spróbuj ponownie.",
 
+  "cond.unknown": "Brak danych o warunkach",
   "cond.clear": "Bezchmurnie",
   "cond.partly": "Częściowe zachmurzenie",
   "cond.cloudy": "Zachmurzenie",

@@ -13,16 +13,16 @@ export function WeekView({ snapshot }: { snapshot: WeatherSnapshot }) {
   const locale = prefs.locale;
   const [open, setOpen] = useState<string | null>(null);
   const days = snapshot.daily.slice(0, 7);
+  if (!days.length) return <p className="card">Daily forecasts are unavailable for this location.</p>;
 
-  const globalMin = Math.min(...days.map((day) => day.min));
-  const globalMax = Math.max(...days.map((day) => day.max));
-  const warmest = days.reduce((best, day) => (day.max > best.max ? day : best), days[0]);
-  const coldest = days.reduce((best, day) => (day.min < best.min ? day : best), days[0]);
-  const windiest = days.reduce(
-    (best, day) => ((day.windMax ?? 0) > (best.windMax ?? 0) ? day : best),
-    days[0],
-  );
-  const totalPrecip = days.reduce((sum, day) => sum + day.precipitation, 0);
+  const globalMin = Math.min(...days.flatMap((day) => day.min ?? []));
+  const globalMax = Math.max(...days.flatMap((day) => day.max ?? []));
+  const warmest = days.filter(day => day.max != null).sort((a, b) => b.max - a.max)[0];
+  const coldest = days.filter(day => day.min != null).sort((a, b) => a.min - b.min)[0];
+  const windiest = days.filter(day => day.windMax != null)
+    .sort((a, b) => (b.windMax ?? 0) - (a.windMax ?? 0))[0];
+  const totalPrecip = days.length && days.every(day => day.precipitation != null)
+    ? days.reduce((sum, day) => sum + day.precipitation, 0) : null;
 
   return (
     <div className="view view-week">
@@ -60,11 +60,10 @@ export function WeekView({ snapshot }: { snapshot: WeatherSnapshot }) {
 
       <section className="card day-list-card" aria-label={t("week.title")}>
         <ul className="day-list">
-          {days.map((day, index) => (
+          {days.map((day) => (
             <DayRow
               key={day.date}
               day={day}
-              index={index}
               globalMin={globalMin}
               globalMax={globalMax}
               timezone={snapshot.timezone}

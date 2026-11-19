@@ -7,7 +7,7 @@ import { scenePreset } from "@/lib/weather/kind";
 
 interface SceneProps {
   kind: WeatherKind;
-  isDay: boolean;
+  isDay: boolean | null;
   motion: MotionLevel;
 }
 
@@ -174,6 +174,7 @@ export function WeatherScene({ kind, isDay, motion }: SceneProps) {
 
   useParticles(canvasRef, precipitation, intensity, motion);
 
+  if (kind === "unknown") return <div className="scene" aria-hidden="true"><div className="scene-sky" /></div>;
   const cloudCount =
     preset === "clear" ? 0 : preset === "partly" ? 2 : preset === "fog" ? 4 : preset === "cloudy" ? 4 : 5;
 
@@ -182,7 +183,7 @@ export function WeatherScene({ kind, isDay, motion }: SceneProps) {
       className="scene"
       data-preset={preset}
       data-kind={kind}
-      data-day={isDay ? "day" : "night"}
+      data-day={isDay == null ? "unspecified" : isDay ? "day" : "night"}
       data-motion={motion}
       aria-hidden="true"
     >
@@ -192,7 +193,7 @@ export function WeatherScene({ kind, isDay, motion }: SceneProps) {
         <span />
         <span />
       </div>
-      {!isDay ? (
+      {isDay === false ? (
         <div className="scene-stars">
           {STARS.slice(0, preset === "clear" ? 64 : 34).map((star, index) => (
             <span
@@ -210,7 +211,7 @@ export function WeatherScene({ kind, isDay, motion }: SceneProps) {
         </div>
       ) : null}
 
-      {preset === "clear" || preset === "partly" ? (
+      {isDay != null && (preset === "clear" || preset === "partly") ? (
         <div className={`scene-orb ${isDay ? "scene-sun" : "scene-moon"}`}>
           <span className="scene-orb-core" />
           <span className="scene-orb-halo" />

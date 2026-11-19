@@ -50,6 +50,8 @@ export function feelsLike(
 
 export function severity(kind: WeatherKind): number {
   switch (kind) {
+    case "unknown":
+      return 0;
     case "hail":
       return 12;
     case "thunder":

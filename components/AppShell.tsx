@@ -8,9 +8,10 @@ import { REPO_URL } from "@/lib/config";
 import { errorMessage, type MessageKey } from "@/lib/i18n";
 import { placeLabel } from "@/lib/places";
 import { formatTemp } from "@/lib/format";
-import { formatTime } from "@/lib/time";
+import { formatFullDate, formatTime } from "@/lib/time";
 import type { TabId } from "@/lib/types";
 import { PROVIDER_MAP } from "@/lib/weather/providers";
+import { OfficialAlerts } from "./WeatherAlert";
 import { PlaceDialog } from "./PlaceDialog";
 import { SettingsDialog } from "./SettingsDialog";
 import { Toast } from "./Toast";
@@ -33,12 +34,21 @@ function Shell() {
 
   const providerName = useMemo(() => {
     if (!data) return "";
+    if (data.provider === "nws") return "National Weather Service";
     const meta = PROVIDER_MAP[data.provider];
     return meta ? `${meta.name} · ${meta.model}` : String(data.provider);
   }, [data]);
 
   const showError = Boolean(error) && !data;
-  const stale = Boolean(error) && Boolean(data);
+  const expiresAt = Date.parse(data?.freshness?.expiresAt ?? "");
+  const [clock, setClock] = useState(Date.now);
+  useEffect(() => {
+    if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) return;
+    const timer = window.setTimeout(() => setClock(Date.now()), expiresAt - Date.now() + 1);
+    return () => window.clearTimeout(timer);
+  }, [expiresAt]);
+  const stale = Boolean(data) && Boolean(error || data?.freshness?.stale || expiresAt <= Math.max(clock, Date.now()));
+  const message = runtime.embedded && error === "provider_error" ? t("error.text") : errorMessage(prefs.locale, error ?? "unknown");
 
   // Offline shell: register the service worker in production builds only, so
   // it never fights the dev server's live reload.
@@ -66,8 +76,8 @@ function Shell() {
 
   useEffect(() => {
     if (!error) return;
-    setToast({ message: errorMessage(prefs.locale, error), tone: "error" });
-  }, [error, prefs.locale]);
+    setToast({ message, tone: "error" });
+  }, [error, message]);
 
   const onSelectPlace = useCallback(
     (place: Parameters<typeof setPlace>[0]) => {
@@ -78,8 +88,8 @@ function Shell() {
     [setPlace, t],
   );
 
-  const sceneKind = data?.current.kind ?? "partly";
-  const sceneDay = data?.current.isDay ?? true;
+  const sceneKind = data?.current.kind ?? "unknown";
+  const sceneDay = data?.current.isDay ?? null;
   const view = data
     ? tab === "today"
       ? <TodayView snapshot={data} />
@@ -224,6 +234,8 @@ function Shell() {
             </div>
           ) : null}
 
+          {data && runtime.embedded ? <OfficialAlerts snapshot={data} stale={stale} /> : null}
+
           {showError ? (
             <section className="card error-card" role="alert">
               <div className="error-art" aria-hidden="true">
@@ -234,7 +246,7 @@ function Shell() {
                 </svg>
               </div>
               <h1>{t("error.title")}</h1>
-              <p>{errorMessage(prefs.locale, error)}</p>
+              <p>{message}</p>
               <div className="error-actions">
                 <button type="button" className="btn btn-primary" onClick={() => refresh()}>
                   {t("common.retry")}
@@ -275,6 +287,7 @@ function Shell() {
         <footer className="footer">
           <div>
             <strong>{data ? providerName : t("app.name")}</strong>
+            {data?.forecastIssuedAt && <span>Forecast issued <time dateTime={data.forecastIssuedAt}>{formatFullDate(new Date(data.forecastIssuedAt), data.timezone, prefs.locale)} {formatTime(data.forecastIssuedAt, data.timezone, prefs.locale)}</time></span>}
             <span>
               {data
                 ? t("footer.updated", {
@@ -284,6 +297,11 @@ function Shell() {
             </span>
           </div>
           <div className="footer-links">
+            {data?.provider === "met-no" && (
+              <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">
+                MET Norway · CC BY 4.0 · normalized forecast
+              </a>
+            )}
             <span>{t("footer.local")}</span>
             <a href={REPO_URL} target="_blank" rel="noreferrer noopener">
               GitHub

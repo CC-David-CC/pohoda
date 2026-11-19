@@ -8,6 +8,12 @@ import css from "pohoda:styles";
 export type { WeatherServices } from "../lib/client/runtime";
 export { createHttpServices } from "../lib/client/runtime";
 
+interface DesktopHost {
+  w: object;
+  signal: AbortSignal;
+  storage?: { signedInSubject?: () => string | null };
+}
+
 export interface AppOptions {
   /** Root of the compatible weather/places/places/reverse/history API. */
   apiBase?: string;
@@ -34,17 +40,20 @@ let instance = 0;
 
 /** Configure once, then register the returned synchronous mount in the WebOS app list. */
 export function createApp(options: AppOptions = {}) {
-  const services = { ...createHttpServices(options.apiBase), ...options.services };
+  const services = { ...createHttpServices(options.apiBase ?? "/services/weather"), ...options.services };
   for (const key of ["weather", "places", "reverse", "history"] as const) {
     if (typeof services[key] !== "function") throw new TypeError(`Pohoda services.${key} must be a function`);
   }
-  return function mount(host: HTMLElement): { element: HTMLElement; dispose: () => void } {
-    if (!host || host.nodeType !== 1 || typeof host.append !== "function" || host.ownerDocument !== document) {
-      throw new TypeError("Pohoda mount(host) requires a DOM element in the current document");
+  return function mount(host: HTMLElement | DesktopHost): { element: HTMLElement; dispose: () => void } {
+    const desktop = "w" in host ? host : null;
+    const containerHost = host instanceof HTMLElement ? host : null;
+    if (containerHost?.ownerDocument !== document && !desktop) {
+      throw new TypeError("Weather requires a WebOS window or a DOM element in the current document");
     }
-    const doc = host.ownerDocument;
+    const doc = document;
     const element = doc.createElement("section");
     element.dataset.webosApp = "pohoda";
+    element.className = "window-content";
     element.setAttribute("aria-label", "Pohoda Weather");
     // The app owns only this element. It never clears, themes, or resizes its host.
     element.style.cssText = "display:block;position:relative;width:100%;height:100%;min-width:0;min-height:0;isolation:isolate;overflow:hidden;";
@@ -66,12 +75,14 @@ export function createApp(options: AppOptions = {}) {
     scrollElement.append(container);
     themeRoot.append(scrollElement, portalRoot);
     shadow.append(style, themeRoot);
-    host.append(element);
+    containerHost?.append(element);
 
     const lifetime = new AbortController();
+    const owner = desktop?.storage?.signedInSubject?.();
+    const preferenceKey = options.storageKey === undefined ? "pohoda.webos.prefs.v1" : options.storageKey;
     const runtime: AppRuntime = {
       embedded: true, themeRoot, scrollElement, portalRoot, services,
-      storageKey: options.storageKey === undefined ? "pohoda.webos.prefs.v1" : options.storageKey,
+      storageKey: desktop ? (owner && preferenceKey ? preferenceKey + "." + owner : null) : preferenceKey,
       initialPrefs: options.initialPrefs, signal: lifetime.signal, onTitle: options.onTitle,
     };
     const root = createRoot(container, { identifierPrefix: `pohoda-${++instance}-` });
@@ -81,16 +92,17 @@ export function createApp(options: AppOptions = {}) {
       </AppBoundary>,
     );
     let disposed = false;
-    return {
-      element,
-      dispose() {
-        if (disposed) return;
-        disposed = true;
-        lifetime.abort();
-        try { root.unmount(); }
-        finally { element.remove(); }
-      },
-    };
+    function dispose() {
+      if (disposed) return;
+      disposed = true;
+      desktop?.signal.removeEventListener("abort", dispose);
+      lifetime.abort();
+      try { root.unmount(); }
+      finally { element.remove(); }
+    }
+    if (desktop?.signal.aborted) dispose();
+    else desktop?.signal.addEventListener("abort", dispose, { once: true });
+    return { element, dispose };
   };
 }
 

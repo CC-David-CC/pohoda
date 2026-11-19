@@ -9,7 +9,7 @@ export const de = {
 
   "tab.today": "Heute",
   "tab.week": "7 Tage",
-  "tab.month": "30 Tage",
+  "tab.month": "Ausblick",
 
   "header.settings": "Einstellungen",
   "header.refresh": "Vorhersage aktualisieren",
@@ -110,7 +110,7 @@ export const de = {
   "week.humidity": "Luftfeuchtigkeit",
   "week.legend": "Die Balken zeigen die Tagesspanne, der Punkt den Durchschnitt.",
 
-  "month.title": "30-Tage-Ausblick",
+  "month.title": "Wetteraussichten",
   "month.summary": "Monat im Überblick",
   "month.avgHigh": "Durchschnittliches Maximum",
   "month.avgLow": "Durchschnittliches Minimum",
@@ -224,6 +224,7 @@ export const de = {
   "error.geoUnsupported": "Dieser Browser unterstützt keine Geolokalisierung.",
   "error.unknown": "Unerwarteter Fehler. Versuche es erneut.",
 
+  "cond.unknown": "Wetterlage unbekannt",
   "cond.clear": "Klarer Himmel",
   "cond.partly": "Teilweise bewölkt",
   "cond.cloudy": "Bewölkt",

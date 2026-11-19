@@ -13,18 +13,19 @@ export function MonthView({ snapshot }: { snapshot: WeatherSnapshot }) {
   const locale = prefs.locale;
   const [open, setOpen] = useState<string | null>(null);
   const days = snapshot.daily.slice(0, 30);
+  if (!days.length) return <p className="card">Daily forecasts are unavailable for this location.</p>;
   const forecast = days.filter((day) => day.source === "forecast");
   const climate = days.filter((day) => day.source === "climate");
 
-  const globalMin = Math.min(...days.map((day) => day.min));
-  const globalMax = Math.max(...days.map((day) => day.max));
-  const avgHigh = mean(days.map((day) => day.max)) ?? 0;
-  const avgLow = mean(days.map((day) => day.min)) ?? 0;
+  const globalMin = Math.min(...days.flatMap((day) => day.min ?? []));
+  const globalMax = Math.max(...days.flatMap((day) => day.max ?? []));
+  const avgHigh = mean(days.map((day) => day.max));
+  const avgLow = mean(days.map((day) => day.min));
   const wetDays = days.filter(
     (day) => day.precipitation >= 1 || (day.precipitationProbability ?? 0) >= 50,
   ).length;
-  const warmest = days.reduce((best, day) => (day.max > best.max ? day : best), days[0]);
-  const coldest = days.reduce((best, day) => (day.min < best.min ? day : best), days[0]);
+  const warmest = days.filter(day => day.max != null).sort((a, b) => b.max - a.max)[0];
+  const coldest = days.filter(day => day.min != null).sort((a, b) => a.min - b.min)[0];
 
   return (
     <div className="view view-month">
@@ -48,8 +49,8 @@ export function MonthView({ snapshot }: { snapshot: WeatherSnapshot }) {
         </article>
         <article className="card summary">
           <span>{t("month.wetDays")}</span>
-          <strong>{wetDays}</strong>
-          <small>{formatPercent((wetDays / Math.max(1, days.length)) * 100, locale)}</small>
+          <strong>{days.every(day => day.precipitation != null || day.precipitationProbability != null) ? wetDays : "—"}</strong>
+          <small>{days.every(day => day.precipitation != null || day.precipitationProbability != null) && formatPercent((wetDays / days.length) * 100, locale)}</small>
         </article>
         <article className="card summary">
           <span>{t("month.warmest")}</span>
@@ -69,11 +70,10 @@ export function MonthView({ snapshot }: { snapshot: WeatherSnapshot }) {
           <span className="chip chip-soft">{formatDayMonth(forecast[0]?.date ?? "", locale)}</span>
         </header>
         <ul className="day-list">
-          {forecast.map((day, index) => (
+          {forecast.map((day) => (
             <DayRow
               key={day.date}
               day={day}
-              index={index}
               globalMin={globalMin}
               globalMax={globalMax}
               timezone={snapshot.timezone}
@@ -94,11 +94,10 @@ export function MonthView({ snapshot }: { snapshot: WeatherSnapshot }) {
               <span className="chip chip-warn">{t("month.climateBadge")}</span>
             </header>
             <ul className="day-list">
-              {climate.map((day, index) => (
+              {climate.map((day) => (
                 <DayRow
                   key={day.date}
                   day={day}
-                  index={forecast.length + index}
                   globalMin={globalMin}
                   globalMax={globalMax}
                   timezone={snapshot.timezone}
@@ -111,7 +110,7 @@ export function MonthView({ snapshot }: { snapshot: WeatherSnapshot }) {
           </>
         ) : null}
 
-        <p className="legend">{t("month.legend")}</p>
+        {climate.length > 0 && <p className="legend">{t("month.legend")}</p>}
       </section>
     </div>
   );

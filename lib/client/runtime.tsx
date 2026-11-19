@@ -45,7 +45,8 @@ export function createHttpServices(apiBase = "/api"): WeatherServices {
       const params = new URLSearchParams({
         lat: String(prefs.place.lat), lon: String(prefs.place.lon),
         id: prefs.place.id, name: prefs.place.name,
-        provider: prefs.provider, days: String(FORECAST_DAYS),
+        days: String(FORECAST_DAYS),
+        ...(base === "/api" ? { provider: prefs.provider } : {}),
       });
       for (const field of ["admin1", "country", "countryCode", "timezone"] as const) {
         if (prefs.place[field]) params.set(field, prefs.place[field]);

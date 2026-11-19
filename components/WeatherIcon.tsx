@@ -7,7 +7,7 @@ import type { MotionLevel, WeatherKind } from "@/lib/types";
 
 interface WeatherIconProps {
   kind: WeatherKind;
-  isDay?: boolean;
+  isDay?: boolean | null;
   pack: IconPack;
   motion?: MotionLevel;
   size?: number;
@@ -209,6 +209,7 @@ function SvgGlyph({
 }
 
 const EMOJI: Record<WeatherKind, [string, string]> = {
+  unknown: ["—", "—"],
   clear: ["☀️", "🌙"],
   partly: ["⛅", "☁️"],
   cloudy: ["🌥️", "☁️"],
@@ -1552,6 +1553,12 @@ export function WeatherIcon({
   className = "",
   title,
 }: WeatherIconProps) {
+  if (isDay === null && (kind === "clear" || kind === "partly")) {
+    // Solar phase is occasionally absent in station observations.
+    return <span className={className} aria-hidden="true" />;
+  }
+  isDay ??= true; // Cloud/precipitation glyphs do not require a solar phase.
+  if (kind === "unknown") return <span className={className} aria-label="Conditions unavailable">—</span>;
   const label = title ?? kind;
   const style = { width: size, height: size };
 

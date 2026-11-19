@@ -7,7 +7,7 @@ export const en = {
 
   "tab.today": "Today",
   "tab.week": "7 days",
-  "tab.month": "30 days",
+  "tab.month": "Outlook",
 
   "header.settings": "Settings",
   "header.refresh": "Refresh forecast",
@@ -108,7 +108,7 @@ export const en = {
   "week.humidity": "Humidity",
   "week.legend": "Bars show the daily range within the week; the dot marks the average.",
 
-  "month.title": "30-day outlook",
+  "month.title": "Forecast outlook",
   "month.summary": "Month at a glance",
   "month.avgHigh": "Average high",
   "month.avgLow": "Average low",
@@ -221,6 +221,7 @@ export const en = {
   "error.geoUnsupported": "This browser does not support geolocation.",
   "error.unknown": "Unexpected error. Try again.",
 
+  "cond.unknown": "Conditions unavailable",
   "cond.clear": "Clear sky",
   "cond.partly": "Partly cloudy",
   "cond.cloudy": "Cloudy",

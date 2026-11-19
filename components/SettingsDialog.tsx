@@ -9,6 +9,7 @@ import { THEMES, THEME_META } from "@/lib/theme";
 import { STYLES } from "@/lib/style";
 import { FONTS } from "@/lib/font";
 import type { PrecipUnit, PressureUnit, TemperatureUnit, WindUnit } from "@/lib/types";
+import { useAppRuntime } from "@/lib/client/runtime";
 import { PROVIDERS, PROVIDER_MAP } from "@/lib/weather/providers";
 import type { WeatherKind } from "@/lib/types";
 import { Modal } from "./Modal";
@@ -106,6 +107,7 @@ export function SettingsDialog({
   const [iconsOpen, setIconsOpen] = useState(false);
   const [providersOpen, setProvidersOpen] = useState(false);
 
+  const { embedded } = useAppRuntime();
   const activeProvider = PROVIDER_MAP[prefs.provider];
 
   return (
@@ -340,6 +342,12 @@ export function SettingsDialog({
         </div>
       </section>
 
+      {embedded ? (
+        <section className="settings-block">
+          <h3>{t("settings.provider.title")}</h3>
+          <p className="hint">US forecasts and alerts from the National Weather Service. International point forecasts from MET Norway.</p>
+        </section>
+      ) : (
       <section className="settings-block">
         <SettingsToggle
           title={t("settings.provider.title")}
@@ -389,6 +397,7 @@ export function SettingsDialog({
           </div>
         ) : null}
       </section>
+      )}
 
       <section className="settings-block">
         <div className="settings-heading">

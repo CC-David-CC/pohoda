@@ -1,5 +1,6 @@
 "use client";
 
+import { useAppRuntime } from "@/lib/client/runtime";
 import { usePrefs } from "@/lib/client/prefs";
 import { useNow } from "@/lib/client/use-weather";
 import {
@@ -64,17 +65,19 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
   const today = daily[0];
   const locale = prefs.locale;
 
-  const nextHours = hourly.slice(0, 24);
-  const rainChance =
-    today?.precipitationProbability ??
-    Math.max(0, ...nextHours.map((hour) => hour.precipitationProbability ?? 0));
+  const start = Date.parse(hourly[0]?.time);
+  const nextHours = hourly.filter(hour => Date.parse(hour.time) < start + 86_400_000);
+  const { embedded } = useAppRuntime();
+  const probabilities = nextHours.flatMap(hour => hour.precipitationProbability ?? []);
+  const rainChance = today?.precipitationProbability ??
+    (probabilities.length ? Math.max(...probabilities) : null);
   const direction = directionKey(current.windDirection);
   const uv = uvKey(current.uvIndex);
   const tone = temperatureTone(current.temperature);
 
   return (
     <div className="view view-today">
-      <WeatherAlert current={current} />
+      {!embedded && <WeatherAlert current={current} />}
       <article className="card hero" data-tone={tone}>
         <div className="hero-main">
           <div className="hero-top">
@@ -82,7 +85,7 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
             <div className="hero-top-right">
               <span className="hero-live">
                 <i aria-hidden="true" />
-                {t("hero.now")} · {formatTime(now.toISOString(), timezone, locale)}
+                {embedded ? (current.source === "observation" ? "Observed" : "Forecast") : t("hero.now")} · {formatFullDate(new Date(current.time), timezone, locale)} {formatTime(current.time, timezone, locale)}
               </span>
               <button
                 type="button"
@@ -120,7 +123,7 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
           <h2 className="hero-cond">{t(`cond.${current.kind}` as MessageKey)}</h2>
           <p className="hero-feels">
             {t("hero.feels", {
-              temp: formatTemp(current.feelsLike ?? current.temperature, prefs.temperature, locale),
+              temp: formatTemp(current.feelsLike, prefs.temperature, locale),
             })}
           </p>
 
@@ -180,13 +183,13 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
             <h3 id="hourly-title">{t("hourly.title")}</h3>
             <p className="card-sub">{t("hourly.subtitle")}</p>
           </div>
-          <span className="chip chip-soft">{nextHours.length} h</span>
+          {nextHours.length > 1 && <span className="chip chip-soft">{formatTime(nextHours[0].time, timezone, locale)} – {formatTime(nextHours[nextHours.length - 1].time, timezone, locale)}</span>}
         </header>
         <div className="hourly-scroll">
           {nextHours.map((hour, index) => (
             <div className="hour" key={hour.time}>
               <span className="hour-time">
-                {index === 0
+                {index === 0 && Date.parse(hour.time) <= now.getTime() && now.getTime() < Date.parse(hour.time) + 3_600_000
                   ? t("hourly.now")
                   : formatHour(hour.time, timezone, locale)}
               </span>
@@ -198,11 +201,11 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
                 size={34}
               />
               <span className="hour-temp">{formatTemp(hour.temperature, prefs.temperature, locale, { withUnit: false })}</span>
-              <span
+              {hour.precipitationProbability != null && <span
                 className="hour-prob"
-                style={{ height: `${Math.max(6, Math.round((hour.precipitationProbability ?? 0) * 0.26))}px` }}
+                style={{ height: `${Math.max(6, Math.round(hour.precipitationProbability * 0.26))}px` }}
                 aria-hidden="true"
-              />
+              />}
               <span className={hour.precipitationProbability ? "hour-rain" : "hour-rain is-dry"}>
                 {hour.precipitationProbability === null
                   ? "·"
@@ -224,13 +227,13 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
             value={formatWind(current.windSpeed, prefs.wind, locale)}
             hint={direction ? t(direction) : undefined}
           >
-            <span
+            {current.windDirection !== null && <span
               className="wind-arrow"
               style={{ transform: `rotate(${(current.windDirection ?? 0) + 180}deg)` }}
               aria-hidden="true"
             >
               ↑
-            </span>
+            </span>}
           </DetailCard>
           <DetailCard
             label={t("metric.gust")}
@@ -241,7 +244,7 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
             label={t("metric.humidity")}
             value={formatPercent(current.humidity, locale)}
           >
-            <Meter value={current.humidity ?? 0} />
+            {current.humidity !== null && <Meter value={current.humidity} />}
           </DetailCard>
           <DetailCard
             label={t("metric.pressure")}
@@ -252,7 +255,7 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
             value={current.uvIndex === null ? "—" : String(Math.round(current.uvIndex))}
             hint={uv ? t(uv) : undefined}
           >
-            <Meter value={((current.uvIndex ?? 0) / 11) * 100} tone={uv ?? undefined} />
+            {current.uvIndex !== null && <Meter value={(current.uvIndex / 11) * 100} tone={uv ?? undefined} />}
           </DetailCard>
           <DetailCard
             label={t("metric.visibility")}
@@ -262,7 +265,7 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
             label={t("metric.clouds")}
             value={formatPercent(current.cloudCover, locale)}
           >
-            <Meter value={current.cloudCover ?? 0} tone="cloud" />
+            {current.cloudCover !== null && <Meter value={current.cloudCover} tone="cloud" />}
           </DetailCard>
           <DetailCard
             label={t("metric.dewPoint")}
@@ -272,8 +275,8 @@ export function TodayView({ snapshot }: { snapshot: WeatherSnapshot }) {
       </section>
 
       <div className="two-col">
-        <SunCard day={today} nextDay={daily[1]} timezone={timezone} />
-        <WindCard current={current} />
+        {today?.sunrise && today.sunset && <SunCard day={today} nextDay={daily[1]} timezone={timezone} />}
+        {current.windSpeed !== null && <WindCard current={current} />}
       </div>
 
       {today ? (

@@ -144,10 +144,12 @@ export function isStorm(kind: WeatherKind): boolean {
   return kind === "thunder" || kind === "hail";
 }
 
-export type ScenePreset = "clear" | "partly" | "cloudy" | "rain" | "snow" | "storm" | "fog";
+export type ScenePreset = "unknown" | "clear" | "partly" | "cloudy" | "rain" | "snow" | "storm" | "fog";
 
 export function scenePreset(kind: WeatherKind): ScenePreset {
   switch (kind) {
+    case "unknown":
+      return "unknown";
     case "clear":
       return "clear";
     case "partly":

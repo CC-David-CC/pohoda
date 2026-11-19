@@ -91,8 +91,8 @@ export function PlaceDialog({ open, onClose, onSelect }: PlaceDialogProps) {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         if (signal.aborted) return;
-        const lat = Math.round(position.coords.latitude * 10000) / 10000;
-        const lon = Math.round(position.coords.longitude * 10000) / 10000;
+        const lat = Math.round(position.coords.latitude * 100) / 100;
+        const lon = Math.round(position.coords.longitude * 100) / 100;
         let place: Place = {
           id: `geo:${lat},${lon}`, name: t("place.myLocation"), lat, lon,
         };
@@ -211,6 +211,7 @@ export function PlaceDialog({ open, onClose, onSelect }: PlaceDialogProps) {
           </ul>
         </div>
       )}
+      {runtime.embedded && <p className="hint">City data from <a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a></p>}
     </Modal>
   );
 }

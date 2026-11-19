@@ -9,7 +9,7 @@ export const ru = {
 
   "tab.today": "Сегодня",
   "tab.week": "7 дней",
-  "tab.month": "30 дней",
+  "tab.month": "Обзор",
 
   "header.settings": "Настройки",
   "header.refresh": "Обновить прогноз",
@@ -110,7 +110,7 @@ export const ru = {
   "week.humidity": "Влажность",
   "week.legend": "Полосы показывают суточный разброс температур, точка — среднее.",
 
-  "month.title": "Прогноз на 30 дней",
+  "month.title": "Обзор прогноза",
   "month.summary": "Месяц кратко",
   "month.avgHigh": "Средний максимум",
   "month.avgLow": "Средний минимум",
@@ -224,6 +224,7 @@ export const ru = {
   "error.geoUnsupported": "Этот браузер не поддерживает геолокацию.",
   "error.unknown": "Неожиданная ошибка. Попробуйте снова.",
 
+  "cond.unknown": "Нет данных о погодных условиях",
   "cond.clear": "Ясно",
   "cond.partly": "Переменная облачность",
   "cond.cloudy": "Облачно",

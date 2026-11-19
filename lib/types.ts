@@ -10,7 +10,8 @@ export type WeatherKind =
   | "snow"
   | "sleet"
   | "thunder"
-  | "hail";
+  | "hail"
+  | "unknown";
 
 export type ProviderId =
   | "open-meteo"
@@ -46,6 +47,7 @@ export interface Place {
 }
 
 export interface CurrentWeather {
+  source?: "observation" | "forecast";
   /** UTC ISO string. */
   time: string;
   temperature: number;
@@ -102,7 +104,12 @@ export interface DailyPoint {
 
 export interface WeatherSnapshot {
   place: Place;
-  provider: ProviderId;
+  provider: ProviderId | "nws";
+  forecastIssuedAt?: string | null;
+  freshness?: { stale: boolean; expiresAt?: string };
+  alerts?: { headline: string; expires: string }[];
+  alertsValidUntil?: string;
+  alertStatus?: "current" | "unavailable" | "outside-coverage";
   fetchedAt: string;
   timezone: string;
   utcOffsetSeconds: number;

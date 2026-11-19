@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePrefs } from "@/lib/client/prefs";
-import type { CurrentWeather } from "@/lib/types";
+import type { CurrentWeather, WeatherSnapshot } from "@/lib/types";
 import { collectAlerts } from "@/lib/weather/alerts";
 
 export function WeatherAlert({ current }: { current: CurrentWeather }) {
@@ -32,5 +32,30 @@ export function WeatherAlert({ current }: { current: CurrentWeather }) {
         ×
       </button>
     </div>
+  );
+}
+
+/** Only the server-verified active warning set is suitable for an official alert banner. */
+export function OfficialAlerts({ snapshot, stale }: { snapshot: WeatherSnapshot; stale: boolean }) {
+  const [now, setNow] = useState(Date.now);
+  const verifiedUntil = snapshot.alertsValidUntil ? Date.parse(snapshot.alertsValidUntil) : Date.parse(snapshot.fetchedAt) + 60_000;
+  useEffect(() => {
+    const expiries = (snapshot.alerts ?? []).map(alert => Date.parse(alert.expires));
+    const expiry = Math.min(...[...expiries, verifiedUntil].filter(time => time > now));
+    if (!Number.isFinite(expiry)) return;
+    const timer = window.setTimeout(() => setNow(Date.now()), Math.max(0, expiry - Date.now()) + 1);
+    return () => window.clearTimeout(timer);
+  }, [snapshot, verifiedUntil, now]);
+
+  if (snapshot.alertStatus === "outside-coverage") return null;
+  if (stale || snapshot.alertStatus !== "current" || !(Date.now() < verifiedUntil)) {
+    return <p className="banner banner-warn" role="status">Current official weather alerts are unavailable.</p>;
+  }
+  const active = (snapshot.alerts ?? []).filter(alert => Date.parse(alert.expires) > Date.now());
+  if (!active.length) return null;
+  return (
+    <aside className="alert-banner" aria-label="National Weather Service alerts" role="status">
+      <ul>{active.map(alert => <li key={alert.headline + alert.expires}>{alert.headline}</li>)}</ul>
+    </aside>
   );
 }

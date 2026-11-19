@@ -8,6 +8,9 @@
 /out/
 next-env.d.ts
 
+# generated standalone browser bundle
+/dist/
+
 # production
 /build
 

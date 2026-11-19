@@ -9,7 +9,7 @@ export const uk = {
 
   "tab.today": "Сьогодні",
   "tab.week": "7 днів",
-  "tab.month": "30 днів",
+  "tab.month": "Огляд",
 
   "header.settings": "Налаштування",
   "header.refresh": "Оновити прогноз",
@@ -110,7 +110,7 @@ export const uk = {
   "week.humidity": "Вологість",
   "week.legend": "Смуги показують добовий діапазон температур, точка — середню.",
 
-  "month.title": "Прогноз на 30 днів",
+  "month.title": "Огляд прогнозу",
   "month.summary": "Місяць коротко",
   "month.avgHigh": "Середній максимум",
   "month.avgLow": "Середній мінімум",
@@ -224,6 +224,7 @@ export const uk = {
   "error.geoUnsupported": "Цей браузер не підтримує геолокацію.",
   "error.unknown": "Непередбачена помилка. Спробуйте ще раз.",
 
+  "cond.unknown": "Немає даних про стан погоди",
   "cond.clear": "Ясно",
   "cond.partly": "Мінлива хмарність",
   "cond.cloudy": "Хмарно",

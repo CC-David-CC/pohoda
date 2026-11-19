@@ -9,7 +9,7 @@ export const es = {
 
   "tab.today": "Hoy",
   "tab.week": "7 días",
-  "tab.month": "30 días",
+  "tab.month": "Perspectiva",
 
   "header.settings": "Ajustes",
   "header.refresh": "Actualizar pronóstico",
@@ -110,7 +110,7 @@ export const es = {
   "week.humidity": "Humedad",
   "week.legend": "Las barras muestran el rango diario; el punto, la media.",
 
-  "month.title": "Perspectiva de 30 días",
+  "month.title": "Pronóstico",
   "month.summary": "El mes de un vistazo",
   "month.avgHigh": "Máxima media",
   "month.avgLow": "Mínima media",
@@ -224,6 +224,7 @@ export const es = {
   "error.geoUnsupported": "Este navegador no admite geolocalización.",
   "error.unknown": "Error inesperado. Inténtalo de nuevo.",
 
+  "cond.unknown": "Condiciones no disponibles",
   "cond.clear": "Cielo despejado",
   "cond.partly": "Parcialmente nublado",
   "cond.cloudy": "Nublado",

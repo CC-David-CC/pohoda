@@ -16,8 +16,8 @@ export function WeekChart({ days }: { days: DailyPoint[] }) {
 
   if (days.length === 0) return null;
 
-  const low = Math.min(...days.map((day) => day.min));
-  const high = Math.max(...days.map((day) => day.max));
+  const low = Math.min(...days.flatMap((day) => day.min ?? []));
+  const high = Math.max(...days.flatMap((day) => day.max ?? []));
   const span = Math.max(1, high - low);
 
   return (
@@ -47,6 +47,7 @@ export function WeekChart({ days }: { days: DailyPoint[] }) {
             return (
               <div className="wc-col" key={day.date} style={barStyle}>
                 <div className="wc-plot">
+                  {day.max != null && day.min != null && <>
                   <span
                     className="wc-bar"
                     style={{ bottom: `${bottom}px`, height: `${height}px` }}
@@ -62,6 +63,7 @@ export function WeekChart({ days }: { days: DailyPoint[] }) {
                   <span className="wc-min" style={{ bottom: `${bottom - 22}px` }}>
                     {tempValue(day.min, prefs.temperature, locale)}°
                   </span>
+                  </>}
                 </div>
 
                 <span className="wc-rain">
@@ -83,13 +85,13 @@ export function WeekChart({ days }: { days: DailyPoint[] }) {
                   title={direction ? t(direction) : undefined}
                   aria-label={direction ? t(direction) : undefined}
                 >
-                  <svg
+                  {day.windDirection != null && <svg
                     viewBox="0 0 24 24"
                     aria-hidden="true"
-                    style={{ transform: `rotate(${(day.windDirection ?? 0) + 180}deg)` }}
+                    style={{ transform: `rotate(${day.windDirection + 180}deg)` }}
                   >
                     <path d="M12 20V5M6 11l6-6 6 6" />
-                  </svg>
+                  </svg>}
                 </span>
 
                 <span className="wc-day">{formatWeekday(day.date, locale, "short")}</span>

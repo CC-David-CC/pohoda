@@ -19,7 +19,7 @@
   <p>The app uses the real <code>mount(host)</code> entry. Drag the window's lower corner to resize it.
      Supply the compatible weather API; this static page does not contain a weather server.</p>
   <form id="config">
-    <label for="api">Weather API</label><input id="api" value="/api" aria-label="Weather API base URL">
+    <label for="api">Weather API</label><input id="api" value="/services/weather" aria-label="Weather API base URL">
     <button>Open / reopen</button><button id="close" type="button">Close</button>
   </form>
   <div id="status" role="status"></div>
@@ -33,7 +33,7 @@
   function open() {
     app?.dispose();
     app = createApp({
-      apiBase: document.getElementById('api').value.trim() || '/api',
+      apiBase: document.getElementById('api').value.trim() || '/services/weather',
       onTitle: title => { status.textContent = title; },
       onError: error => { status.textContent = String(error); },
     })(host);

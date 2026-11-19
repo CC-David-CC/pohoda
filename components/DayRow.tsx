@@ -7,7 +7,7 @@ import {
   formatTemp,
   formatWind,
 } from "@/lib/format";
-import { formatDayMonth, formatTime, formatWeekday } from "@/lib/time";
+import { todayKey, addDays, formatDayMonth, formatTime, formatWeekday } from "@/lib/time";
 import type { DailyPoint } from "@/lib/types";
 import type { MessageKey } from "@/lib/i18n";
 import { directionKey, uvKey } from "@/lib/units";
@@ -16,7 +16,6 @@ import { WeatherIcon } from "./WeatherIcon";
 
 interface DayRowProps {
   day: DailyPoint;
-  index: number;
   globalMin: number;
   globalMax: number;
   timezone: string;
@@ -27,7 +26,6 @@ interface DayRowProps {
 
 export function DayRow({
   day,
-  index,
   globalMin,
   globalMax,
   timezone,
@@ -41,8 +39,9 @@ export function DayRow({
   const direction = directionKey(day.windDirection);
   const uv = uvKey(day.uvMax);
 
+  const today = todayKey(timezone);
   const label =
-    index === 0 ? t("week.today") : index === 1 ? t("week.tomorrow") : formatWeekday(day.date, locale, "short");
+    day.date === today ? t("week.today") : day.date === addDays(today, 1) ? t("week.tomorrow") : formatWeekday(day.date, locale, "short");
 
   return (
     <li className={open ? "day-row is-open" : "day-row"} data-source={day.source}>
@@ -72,14 +71,14 @@ export function DayRow({
           {formatPercent(day.precipitationProbability, locale)}
         </span>
         <span className="day-min">{formatTemp(day.min, prefs.temperature, locale, { withUnit: false })}</span>
-        <RangeBar
+        {day.max != null && day.min != null ? <RangeBar
           min={day.min}
           max={day.max}
           average={average}
           globalMin={globalMin}
           globalMax={globalMax}
           source={day.source}
-        />
+        /> : <span />}
         <span className="day-max">{formatTemp(day.max, prefs.temperature, locale, { withUnit: false })}</span>
         <svg className="day-chevron" viewBox="0 0 24 24" aria-hidden="true">
           <path d="m6 9 6 6 6-6" />

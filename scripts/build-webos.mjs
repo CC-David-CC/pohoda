@@ -1,10 +1,15 @@
 import { build } from 'esbuild';
 import { readFile, mkdir, writeFile, copyFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { resolve, join } from 'node:path';
+import { parseArgs } from 'node:util';
+import { createHash } from 'node:crypto';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const path = name => new URL(`../${name}`, import.meta.url);
-await mkdir(path('dist'), { recursive: true });
+const { values } = parseArgs({ options: { outdir: { type: 'string' } } });
+const out = resolve(values.outdir ?? join(root, 'dist'));
+await mkdir(out, { recursive: true });
 
 // These are source styles, not a second independently maintained theme system.
 // Shadow DOM isolates selectors; container queries make each desktop window responsive.
@@ -24,10 +29,10 @@ const css = upstream
 .pohoda-portals > * { pointer-events: auto; }
 `;
 
-await build({
+const bundled = await build({
   absWorkingDir: root,
   entryPoints: ['webos/entry.tsx'],
-  outfile: 'dist/pohoda.mjs',
+  outfile: join(out, 'pohoda.mjs'), metafile: true,
   bundle: true, format: 'esm', platform: 'browser', target: ['chrome120'],
   jsx: 'automatic', minify: true, legalComments: 'linked',
   define: { 'process.env.NODE_ENV': '"production"' },
@@ -36,8 +41,18 @@ await build({
     build.onLoad({ filter: /.*/, namespace: 'pohoda' }, () => ({ contents: css, loader: 'text' }));
   } }],
 });
-await writeFile(path('dist/pohoda.css'), css);
-await copyFile(path('LICENSE'), path('dist/LICENSE'));
+await writeFile(join(out, 'pohoda.css'), css);
+await copyFile(path('LICENSE'), join(out, 'LICENSE'));
 const licenses = await Promise.all(['react', 'react-dom', 'scheduler'].map(async name => `=== ${name} ===\n${await readFile(path(`node_modules/${name}/LICENSE`), 'utf8')}`));
-await writeFile(path('dist/THIRD_PARTY_LICENSES.txt'), licenses.join('\n\n')); 
-console.log('Built dist/pohoda.mjs (React + application + isolated CSS included).');
+await writeFile(join(out, 'THIRD_PARTY_LICENSES.txt'), licenses.join('\n\n'));
+// Include build-only inputs outside esbuild's JavaScript dependency graph.
+const sources = new Set([
+  ...Object.keys(bundled.metafile.inputs).filter(name => !name.startsWith('node_modules/') && !name.includes(':')),
+  'app.mjs', 'app/globals.css', 'app/weather.css', 'app/icon.svg', 'scripts/build-webos.mjs',
+  'package.json', 'package-lock.json', 'tsconfig.json', 'LICENSE',
+]);
+const inputs = await Promise.all([...sources].sort().map(async name => ({
+  path: name, sha256: createHash('sha256').update(await readFile(path(name))).digest('hex'),
+})));
+await writeFile(join(out, 'build-inputs.json'), JSON.stringify(inputs, null, 2) + '\n');
+console.log('Built Pohoda browser module in', out);
