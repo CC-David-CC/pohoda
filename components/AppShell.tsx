@@ -112,7 +112,7 @@ function Shell() {
               </svg>
             </span>
             <span className="brand-text">
-              <strong>Pohoda</strong>
+              <strong>{runtime.embedded ? "Weather" : "Pohoda"}</strong>
               <small>{t("app.tagline")}</small>
             </span>
           </div>
@@ -234,7 +234,7 @@ function Shell() {
             </div>
           ) : null}
 
-          {data && runtime.embedded ? <OfficialAlerts snapshot={data} stale={stale} refreshing={refreshing} /> : null}
+          {data && runtime.embedded ? <OfficialAlerts key={data.place.id} snapshot={data} stale={stale} refreshing={refreshing} checkedAt={fetchedAt} /> : null}
 
           {showError ? (
             <section className="card error-card" role="alert">

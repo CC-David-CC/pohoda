@@ -64,7 +64,7 @@ const WINDS: WindUnit[] = ["kmh", "ms", "mph"];
 const PRESSURES: PressureUnit[] = ["hpa", "mmhg", "inhg"];
 const PRECIP: PrecipUnit[] = ["mm", "in"];
 
-export function basePrefs(): Prefs {
+export function basePrefs(embedded = false): Prefs {
   return {
     locale: "en",
     theme: "daylight",
@@ -74,7 +74,7 @@ export function basePrefs(): Prefs {
     provider: "open-meteo",
     place: FALLBACK_PLACE,
     places: [],
-    temperature: "c",
+    temperature: embedded ? "f" : "c",
     wind: "kmh",
     pressure: "hpa",
     precipitation: "mm",
@@ -173,7 +173,7 @@ const PrefsContext = createContext<PrefsContextValue | null>(null);
 
 export function PrefsProvider({ children }: { children: ReactNode }) {
   const runtime = useAppRuntime();
-  const [prefs, setPrefs] = useState<Prefs>(basePrefs);
+  const [prefs, setPrefs] = useState<Prefs>(() => basePrefs(runtime.embedded));
   const [ready, setReady] = useState(false);
   const latest = useRef(prefs);
   latest.current = prefs;
@@ -187,7 +187,7 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
       stored = null;
     }
     const fallback: Prefs = {
-      ...basePrefs(),
+      ...basePrefs(runtime.embedded),
       locale: detectLocale(),
       theme: detectTheme(),
       place: runtime.embedded ? ATLANTA_PLACE : guessPlace(),
@@ -237,7 +237,7 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
 
   const reset = useCallback(() => {
     setPrefs({
-      ...basePrefs(),
+      ...basePrefs(runtime.embedded),
       locale: detectLocale(),
       theme: detectTheme(),
       place: runtime.embedded ? ATLANTA_PLACE : guessPlace(),

@@ -14,9 +14,6 @@ interface WeatherState {
   checkedAt: number | null;
 }
 
-const ALERT_RETRY_MS = 60_000;
-const MIN_ALERT_REFRESH_MS = 15_000;
-
 export function useWeather(prefs: Prefs, ready: boolean) {
   const runtime = useAppRuntime();
   // Appearance changes never refetch weather.
@@ -93,17 +90,10 @@ export function useWeather(prefs: Prefs, ready: boolean) {
     };
   }, [load, ready]);
 
-  const { checkedAt, data, error } = state;
+  const { checkedAt } = state;
   useEffect(() => {
     if (!ready || checkedAt === null) return;
-    let next = checkedAt + REFRESH_MS;
-    if (data?.provider === "nws") {
-      const validUntil = Date.parse(data.alertsValidUntil ?? "");
-      const alertCheck = !error && data.alertStatus === "current" && validUntil > checkedAt
-        ? Math.max(validUntil, checkedAt + MIN_ALERT_REFRESH_MS)
-        : checkedAt + ALERT_RETRY_MS;
-      next = Math.min(next, alertCheck);
-    }
+    const next = checkedAt + REFRESH_MS;
     const refreshIfDue = () => {
       if (document.visibilityState === "visible" && Date.now() >= next) void load(true);
     };
@@ -113,7 +103,7 @@ export function useWeather(prefs: Prefs, ready: boolean) {
       window.clearTimeout(timer);
       document.removeEventListener("visibilitychange", refreshIfDue);
     };
-  }, [load, ready, checkedAt, data, error]);
+  }, [load, ready, checkedAt]);
 
   const refresh = useCallback(() => void load(true), [load]);
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePrefs } from "@/lib/client/prefs";
+import { formatTime } from "@/lib/time";
 import type { CurrentWeather, WeatherSnapshot } from "@/lib/types";
 import { collectAlerts } from "@/lib/weather/alerts";
 
@@ -36,9 +37,18 @@ export function WeatherAlert({ current }: { current: CurrentWeather }) {
 }
 
 /** Only the server-verified active warning set is suitable for an official alert banner. */
-export function OfficialAlerts({ snapshot, stale, refreshing }: { snapshot: WeatherSnapshot; stale: boolean; refreshing: boolean }) {
+export function OfficialAlerts({ snapshot, stale, refreshing, checkedAt }: {
+  snapshot: WeatherSnapshot; stale: boolean; refreshing: boolean; checkedAt: number | null;
+}) {
+  const { prefs } = usePrefs();
   const [now, setNow] = useState(Date.now);
+  const [lastClearCheck, setLastClearCheck] = useState<number | null>(null);
   const verifiedUntil = snapshot.alertsValidUntil ? Date.parse(snapshot.alertsValidUntil) : Date.parse(snapshot.fetchedAt) + 60_000;
+  useEffect(() => {
+    if (stale || checkedAt === null || snapshot.alertStatus !== "current" || checkedAt >= verifiedUntil) return;
+    const hadActiveAlert = snapshot.alerts?.some(alert => Date.parse(alert.expires) > checkedAt);
+    setLastClearCheck(hadActiveAlert ? null : checkedAt);
+  }, [checkedAt, snapshot, stale, verifiedUntil]);
   useEffect(() => {
     const expiries = (snapshot.alerts ?? []).map(alert => Date.parse(alert.expires));
     const expiry = Math.min(...[...expiries, verifiedUntil].filter(time => time > now));
@@ -49,7 +59,14 @@ export function OfficialAlerts({ snapshot, stale, refreshing }: { snapshot: Weat
 
   if (snapshot.alertStatus === "outside-coverage") return null;
   if (stale || snapshot.alertStatus !== "current" || !(Date.now() < verifiedUntil)) {
-    return <p className="official-alert-status" role="status">{refreshing ? "Checking alerts…" : "Alerts could not be checked."}</p>;
+    const lastChecked = lastClearCheck !== null
+      ? formatTime(new Date(lastClearCheck).toISOString(), snapshot.timezone, prefs.locale)
+      : null;
+    return (
+      <p className="official-alert-status" role="status">
+        {lastChecked ? `Last check at ${lastChecked}: no active alerts.` : refreshing ? "Checking alerts…" : "Alerts could not be checked."}
+      </p>
+    );
   }
   const active = (snapshot.alerts ?? []).filter(alert => Date.parse(alert.expires) > Date.now());
   if (!active.length) return <p className="official-alert-status" role="status">No active alerts</p>;
