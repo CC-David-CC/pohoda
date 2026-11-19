@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PrefsProvider, usePrefs } from "@/lib/client/prefs";
 import { useWeather } from "@/lib/client/use-weather";
+import { useAppRuntime } from "@/lib/client/runtime";
 import { REPO_URL } from "@/lib/config";
 import { errorMessage, type MessageKey } from "@/lib/i18n";
 import { placeLabel } from "@/lib/places";
@@ -21,6 +22,7 @@ import { WeekView } from "./views/WeekView";
 const TABS: TabId[] = ["today", "week", "month"];
 
 function Shell() {
+  const runtime = useAppRuntime();
   const { prefs, ready, iconPack, t, update, setPlace } = usePrefs();
   const { data, error, loading, refreshing, fetchedAt, refresh } = useWeather(prefs, ready);
   const [tab, setTab] = useState<TabId>("today");
@@ -32,7 +34,7 @@ function Shell() {
   const providerName = useMemo(() => {
     if (!data) return "";
     const meta = PROVIDER_MAP[data.provider];
-    return `${meta.name} · ${meta.model}`;
+    return meta ? `${meta.name} · ${meta.model}` : String(data.provider);
   }, [data]);
 
   const showError = Boolean(error) && !data;
@@ -41,21 +43,26 @@ function Shell() {
   // Offline shell: register the service worker in production builds only, so
   // it never fights the dev server's live reload.
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production") return;
+    if (runtime.embedded || process.env.NODE_ENV !== "production") return;
     if (!("serviceWorker" in navigator)) return;
     navigator.serviceWorker.register("/sw.js").catch(() => {});
-  }, []);
+  }, [runtime]);
 
   useEffect(() => {
     if (!data) return;
     const time = formatTime(data.fetchedAt, data.timezone, prefs.locale);
-    document.title = `${formatTemp(data.current.temperature, prefs.temperature, prefs.locale, {
+    const title = `${formatTemp(data.current.temperature, prefs.temperature, prefs.locale, {
       withUnit: false,
     })} ${placeLabel(data.place)} · Pohoda`;
+    if (runtime.embedded) {
+      runtime.onTitle?.(title);
+      return;
+    }
+    document.title = title;
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute("content", `${t("app.description")} ${time}`);
-  }, [data, prefs.locale, prefs.temperature, t]);
+  }, [data, prefs.locale, prefs.temperature, t, runtime]);
 
   useEffect(() => {
     if (!error) return;

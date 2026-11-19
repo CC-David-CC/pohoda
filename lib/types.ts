@@ -143,4 +143,5 @@ export type WeatherErrorCode =
   | "timeout"
   | "rate_limit"
   | "network"
+  | "backend_unavailable"
   | "unknown";

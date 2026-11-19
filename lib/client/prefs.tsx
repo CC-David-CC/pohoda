@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { PREFS_STORAGE_KEY } from "@/lib/client/storage";
+import { useAppRuntime } from "@/lib/client/runtime";
 import { detectLocale, isLocale, translate, type MessageKey, type MessageVars } from "@/lib/i18n";
 import { FALLBACK_PLACE, guessPlace, samePlace } from "@/lib/places";
 import { applyTheme, detectTheme, isTheme, type ThemeId } from "@/lib/theme";
@@ -172,6 +172,7 @@ interface PrefsContextValue {
 const PrefsContext = createContext<PrefsContextValue | null>(null);
 
 export function PrefsProvider({ children }: { children: ReactNode }) {
+  const runtime = useAppRuntime();
   const [prefs, setPrefs] = useState<Prefs>(basePrefs);
   const [ready, setReady] = useState(false);
   const latest = useRef(prefs);
@@ -180,7 +181,7 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let stored: unknown = null;
     try {
-      const raw = localStorage.getItem(PREFS_STORAGE_KEY);
+      const raw = runtime.storageKey ? localStorage.getItem(runtime.storageKey) : null;
       stored = raw ? JSON.parse(raw) : null;
     } catch {
       stored = null;
@@ -192,28 +193,28 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
       place: guessPlace(),
       motion: initialMotion(),
     };
-    const next = normalize(stored, fallback);
+    const next = normalize({ ...asRecord(stored), ...runtime.initialPrefs }, fallback);
     setPrefs(next);
-    applyStyle(next.style as StyleId);
-    applyFont(next.font as Parameters<typeof applyFont>[0]);
-    applyTheme(next.theme as ThemeId);
+    applyStyle(next.style as StyleId, runtime.themeRoot ?? undefined);
+    applyFont(next.font as Parameters<typeof applyFont>[0], runtime.themeRoot ?? undefined);
+    applyTheme(next.theme as ThemeId, runtime.themeRoot ?? undefined);
     setReady(true);
-  }, []);
+  }, [runtime]);
 
   useEffect(() => {
     if (!ready) return;
     try {
-      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(prefs));
+      if (runtime.storageKey) localStorage.setItem(runtime.storageKey, JSON.stringify(prefs));
     } catch {
       // Storage can be full or blocked; the app still works in memory.
     }
-    applyTheme(prefs.theme as ThemeId);
-    applyStyle(prefs.style as StyleId);
-    applyFont(prefs.font as Parameters<typeof applyFont>[0]);
+    applyTheme(prefs.theme as ThemeId, runtime.themeRoot ?? undefined);
+    applyStyle(prefs.style as StyleId, runtime.themeRoot ?? undefined);
+    applyFont(prefs.font as Parameters<typeof applyFont>[0], runtime.themeRoot ?? undefined);
     if (typeof document !== "undefined") {
-      document.documentElement.lang = prefs.locale;
+      (runtime.themeRoot ?? document.documentElement).lang = prefs.locale;
     }
-  }, [prefs, ready]);
+  }, [prefs, ready, runtime]);
 
   const update = useCallback((patch: Partial<Prefs>) => {
     setPrefs((current) => ({ ...current, ...patch }));

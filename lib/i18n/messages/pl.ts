@@ -212,6 +212,7 @@ export const pl = {
   "error.title": "Pogoda niedostępna",
   "error.text": "Nie udało się pobrać prognozy.",
   "error.network": "Sprawdź połączenie i spróbuj ponownie.",
+  "error.backend": "Usługa pogodowa nie jest połączona. Sprawdź skonfigurowane API pogody.",
   "error.provider": "Dostawca nie odpowiedział. Wybierz innego w ustawieniach.",
   "error.keyRequired": "Ten dostawca wymaga klucza API. Dodaj go w ustawieniach.",
   "error.keyInvalid": "Dostawca odrzucił klucz API. Sprawdź go w ustawieniach.",

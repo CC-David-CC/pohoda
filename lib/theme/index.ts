@@ -206,12 +206,12 @@ export function detectTheme(): ThemeId {
   }
 }
 
-export function applyTheme(theme: ThemeId): void {
+export function applyTheme(theme: ThemeId, target?: HTMLElement): void {
   if (typeof document === "undefined") return;
-  const root = document.documentElement;
+  const root = target ?? document.documentElement;
   root.setAttribute("data-theme", theme);
   root.setAttribute("data-scheme", THEME_META[theme].scheme);
-  const meta = document.querySelector('meta[name="theme-color"]');
+  const meta = target ? null : document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute("content", THEME_META[theme].barColor);
 }
 

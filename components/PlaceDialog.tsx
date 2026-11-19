@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePrefs } from "@/lib/client/prefs";
+import { useAppRuntime } from "@/lib/client/runtime";
 import { placeSecondary } from "@/lib/places";
 import type { Place } from "@/lib/types";
 import { formatCoords } from "@/lib/format";
@@ -18,6 +19,7 @@ interface GeoPlace extends Place {
 }
 
 export function PlaceDialog({ open, onClose, onSelect }: PlaceDialogProps) {
+  const runtime = useAppRuntime();
   const { prefs, t } = usePrefs();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GeoPlace[]>([]);
@@ -25,14 +27,21 @@ export function PlaceDialog({ open, onClose, onSelect }: PlaceDialogProps) {
   const [error, setError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
   const [touched, setTouched] = useState(false);
-  const controller = useRef<AbortController | null>(null);
+  const locationController = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (!open) return;
+    const controller = new AbortController();
+    locationController.current = controller;
     setQuery("");
     setResults([]);
     setError(null);
     setTouched(false);
+    setLocating(false);
+    return () => {
+      controller.abort();
+      if (locationController.current === controller) locationController.current = null;
+    };
   }, [open]);
 
   useEffect(() => {
@@ -43,80 +52,63 @@ export function PlaceDialog({ open, onClose, onSelect }: PlaceDialogProps) {
       setSearching(false);
       return;
     }
+    const controller = new AbortController();
+    const signal = runtime.signal
+      ? AbortSignal.any([controller.signal, runtime.signal]) : controller.signal;
     setSearching(true);
     setError(null);
     const timer = window.setTimeout(async () => {
-      controller.current?.abort();
-      const next = new AbortController();
-      controller.current = next;
       try {
-        const params = new URLSearchParams({
-          q: trimmed,
-          lang: prefs.locale,
-          count: "8",
-        });
-        const response = await fetch(`/api/places?${params.toString()}`, {
-          signal: next.signal,
-        });
-        if (!response.ok) throw new Error("search");
-        const data = (await response.json()) as { results?: GeoPlace[] };
-        if (!next.signal.aborted) {
-          setResults(data.results ?? []);
+        const places = await runtime.services.places(trimmed, prefs.locale, signal);
+        if (!signal.aborted) {
+          setResults(places);
           setTouched(true);
         }
       } catch {
-        if (!next.signal.aborted) {
+        if (!signal.aborted) {
           setResults([]);
           setError(t("place.searchError"));
         }
       } finally {
-        if (!next.signal.aborted) setSearching(false);
+        if (!signal.aborted) setSearching(false);
       }
     }, 340);
-    return () => window.clearTimeout(timer);
-  }, [query, open, prefs.locale, t]);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [query, open, prefs.locale, t, runtime]);
 
   const locate = () => {
     if (!navigator.geolocation) {
       setError(t("error.geoUnsupported"));
       return;
     }
+    const controller = locationController.current;
+    if (!controller || controller.signal.aborted) return;
+    const signal = runtime.signal
+      ? AbortSignal.any([controller.signal, runtime.signal]) : controller.signal;
     setLocating(true);
     setError(null);
+    // getCurrentPosition has no cancellation API. Ignore callbacks after close/disposal.
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        if (signal.aborted) return;
         const lat = Math.round(position.coords.latitude * 10000) / 10000;
         const lon = Math.round(position.coords.longitude * 10000) / 10000;
         let place: Place = {
-          id: `geo:${lat},${lon}`,
-          name: t("place.myLocation"),
-          lat,
-          lon,
+          id: `geo:${lat},${lon}`, name: t("place.myLocation"), lat, lon,
         };
         try {
-          const params = new URLSearchParams({
-            lat: String(lat),
-            lon: String(lon),
-            lang: prefs.locale,
-          });
-          const response = await fetch(`/api/places/reverse?${params.toString()}`);
-          if (response.ok) {
-            const data = (await response.json()) as { place?: Place };
-            if (data.place) place = { ...data.place, id: `geo:${lat},${lon}`, lat, lon };
-          }
-        } catch {
-          // Coordinates alone are enough for the forecast.
-        }
+          const result = await runtime.services.reverse(lat, lon, prefs.locale, signal);
+          if (result) place = { ...result, id: `geo:${lat},${lon}`, lat, lon };
+        } catch { /* Coordinates remain enough to request the forecast. */ }
+        if (signal.aborted) return;
         setLocating(false);
         onSelect(place);
       },
       (geoError) => {
+        if (signal.aborted) return;
         setLocating(false);
-        setError(
-          geoError.code === geoError.PERMISSION_DENIED
-            ? t("error.geoDenied")
-            : t("error.geoUnavailable"),
-        );
+        setError(geoError.code === geoError.PERMISSION_DENIED
+          ? t("error.geoDenied") : t("error.geoUnavailable"));
       },
       { timeout: 12_000, maximumAge: 300_000, enableHighAccuracy: false },
     );

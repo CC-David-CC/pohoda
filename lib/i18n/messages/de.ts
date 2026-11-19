@@ -212,6 +212,7 @@ export const de = {
   "error.title": "Wetter nicht verfügbar",
   "error.text": "Die Vorhersage konnte nicht geladen werden.",
   "error.network": "Prüfe die Verbindung und versuche es erneut.",
+  "error.backend": "Der Wetterdienst ist nicht verbunden. Prüfe die konfigurierte Wetter-API.",
   "error.provider": "Der Anbieter hat nicht geantwortet. Wähle in den Einstellungen einen anderen.",
   "error.keyRequired": "Dieser Anbieter benötigt einen API-Schlüssel. Füge ihn in den Einstellungen hinzu.",
   "error.keyInvalid": "Der Anbieter hat den API-Schlüssel abgelehnt. Prüfe ihn in den Einstellungen.",

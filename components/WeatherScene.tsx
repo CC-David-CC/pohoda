@@ -52,7 +52,7 @@ function useParticles(
     let running = true;
     // Phones report dpr 2–3; drawing rain at that density doubles the fill cost
     // for no visible gain on 1 px strokes.
-    const dpr = Math.min(window.innerWidth < 700 ? 1.5 : 2, window.devicePixelRatio || 1);
+    const dpr = Math.min(canvas.clientWidth < 700 ? 1.5 : 2, window.devicePixelRatio || 1);
 
     interface Drop {
       x: number;
@@ -100,7 +100,8 @@ function useParticles(
     };
 
     resize();
-    window.addEventListener("resize", resize);
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas);
 
     let last = performance.now();
     const tick = (time: number) => {
@@ -157,7 +158,7 @@ function useParticles(
     return () => {
       running = false;
       cancelAnimationFrame(frame);
-      window.removeEventListener("resize", resize);
+      observer.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [canvasRef, mode, intensity, motion]);

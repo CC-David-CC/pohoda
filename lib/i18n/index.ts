@@ -47,6 +47,7 @@ const ERROR_KEYS: Record<WeatherErrorCode, MessageKey> = {
   timeout: "error.timeout",
   rate_limit: "error.rateLimit",
   network: "error.network",
+  backend_unavailable: "error.backend",
   unknown: "error.unknown",
 };
 

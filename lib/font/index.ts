@@ -28,7 +28,7 @@ export function isFont(value: unknown): value is FontId {
   return typeof value === "string" && FONT_SET.has(value);
 }
 
-export function applyFont(font: FontId): void {
+export function applyFont(font: FontId, target?: HTMLElement): void {
   if (typeof document === "undefined") return;
-  document.documentElement.setAttribute("data-font", font);
+  (target ?? document.documentElement).setAttribute("data-font", font);
 }

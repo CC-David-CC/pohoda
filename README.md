@@ -1,3 +1,5 @@
+> **WebOS adaptation:** import `mount` from `app.mjs`. Prebuilt native module, lifecycle, API integration, and standalone demo instructions are in [WEBOS.md](WEBOS.md).
+
 <div align="center">
 
 # ☀️ Pohoda

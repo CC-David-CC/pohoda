@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useAppRuntime } from "@/lib/client/runtime";
 
 interface ModalProps {
   open: boolean;
@@ -24,46 +25,57 @@ export function Modal({
   footer,
   size = "md",
 }: ModalProps) {
+  const runtime = useAppRuntime();
   const panel = useRef<HTMLDivElement>(null);
+  const close = useRef(onClose);
+  close.current = onClose;
   const restore = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
-    restore.current = document.activeElement as HTMLElement | null;
-    const { overflow } = document.body.style;
-    document.body.style.overflow = "hidden";
+    const dialog = panel.current;
+    if (!dialog) return;
+    const focusRoot = dialog.getRootNode() as Document | ShadowRoot;
+    restore.current = focusRoot.activeElement as HTMLElement | null;
+    const scroll = runtime.scrollElement ?? document.body;
+    const { overflow } = scroll.style;
+    const previousInert = scroll.inert;
+    scroll.style.overflow = "hidden";
+    if (runtime.embedded) scroll.inert = true;
     const timer = window.setTimeout(() => panel.current?.focus(), 30);
 
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        onClose();
+        event.stopPropagation();
+        close.current();
         return;
       }
       if (event.key !== "Tab" || !panel.current) return;
       const focusable = panel.current.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
-      if (focusable.length === 0) return;
+      if (focusable.length === 0) { event.preventDefault(); return; }
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
+      if (event.shiftKey && (focusRoot.activeElement === first || focusRoot.activeElement === dialog)) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && (focusRoot.activeElement === last || focusRoot.activeElement === dialog)) {
         event.preventDefault();
         first.focus();
       }
     };
 
-    document.addEventListener("keydown", onKey);
+    dialog.addEventListener("keydown", onKey);
     return () => {
       window.clearTimeout(timer);
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = overflow;
-      restore.current?.focus?.();
+      dialog.removeEventListener("keydown", onKey);
+      scroll.style.overflow = overflow;
+      scroll.inert = previousInert;
+      if (!runtime.signal?.aborted && restore.current?.isConnected) restore.current.focus();
     };
-  }, [open, onClose]);
+  }, [open, runtime]);
 
   if (!open) return null;
   if (typeof document === "undefined") return null;
@@ -94,6 +106,6 @@ export function Modal({
         {footer ? <div className="modal-foot">{footer}</div> : null}
       </div>
     </div>,
-    document.body,
+    runtime.portalRoot ?? document.body,
   );
 }

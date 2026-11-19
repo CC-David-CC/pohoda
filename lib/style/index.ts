@@ -32,7 +32,7 @@ export function isStyle(value: unknown): value is StyleId {
   return typeof value === "string" && STYLE_SET.has(value);
 }
 
-export function applyStyle(style: StyleId): void {
+export function applyStyle(style: StyleId, target?: HTMLElement): void {
   if (typeof document === "undefined") return;
-  document.documentElement.setAttribute("data-style", style);
+  (target ?? document.documentElement).setAttribute("data-style", style);
 }

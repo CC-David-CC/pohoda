@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePrefs } from "@/lib/client/prefs";
+import { useAppRuntime } from "@/lib/client/runtime";
 import { formatPrecip, formatTemp, formatWind } from "@/lib/format";
 import type { MessageKey } from "@/lib/i18n";
 import { formatArchiveDate, formatDayMonth } from "@/lib/time";
@@ -31,6 +32,7 @@ function yearsKey(locale: string, years: number): MessageKey {
 }
 
 export function ThisDayCard({ date, today, lat, lon }: ThisDayCardProps) {
+  const runtime = useAppRuntime();
   const { prefs, t, iconPack } = usePrefs();
   const locale = prefs.locale;
   const [open, setOpen] = useState(false);
@@ -38,26 +40,24 @@ export function ThisDayCard({ date, today, lat, lon }: ThisDayCardProps) {
   const [failed, setFailed] = useState(false);
   const [selected, setSelected] = useState(1);
 
+  useEffect(() => { setYears(null); setFailed(false); setSelected(1); }, [lat, lon, date]);
+
   useEffect(() => {
     if (!open || years !== null || failed) return;
     const controller = new AbortController();
-    const params = new URLSearchParams({
-      lat: String(lat),
-      lon: String(lon),
-      date,
-    });
-    fetch(`/api/history?${params.toString()}`, { signal: controller.signal })
-      .then((response) => (response.ok ? response.json() : Promise.reject(new Error("request"))))
-      .then((payload: { years?: HistoryYear[] }) => {
-        if (controller.signal.aborted) return;
-        setYears(Array.isArray(payload.years) ? payload.years : []);
+    const signal = runtime.signal
+      ? AbortSignal.any([controller.signal, runtime.signal]) : controller.signal;
+    runtime.services.history(lat, lon, date, signal)
+      .then((payload) => {
+        if (signal.aborted) return;
+        setYears(payload);
       })
       .catch(() => {
-        if (controller.signal.aborted) return;
+        if (signal.aborted) return;
         setFailed(true);
       });
     return () => controller.abort();
-  }, [open, years, failed, lat, lon, date]);
+  }, [open, years, failed, lat, lon, date, runtime]);
 
   const active = useMemo(
     () => years?.find((year) => year.yearsAgo === selected) ?? years?.[0] ?? null,

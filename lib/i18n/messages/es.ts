@@ -212,6 +212,7 @@ export const es = {
   "error.title": "Tiempo no disponible",
   "error.text": "No se pudo cargar el pronóstico.",
   "error.network": "Comprueba la conexión e inténtalo de nuevo.",
+  "error.backend": "El servicio del tiempo no está conectado. Revisa la API meteorológica configurada.",
   "error.provider": "El proveedor no respondió. Elige otro en Ajustes.",
   "error.keyRequired": "Este proveedor necesita una clave API. Añádela en Ajustes.",
   "error.keyInvalid": "El proveedor rechazó la clave API. Compruébala en Ajustes.",

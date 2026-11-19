@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { FORECAST_DAYS, REFRESH_MS } from "@/lib/config";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { REFRESH_MS } from "@/lib/config";
 import type { Prefs, WeatherSnapshot } from "@/lib/types";
+import { useAppRuntime } from "./runtime";
 
 interface WeatherState {
   data: WeatherSnapshot | null;
@@ -12,23 +13,10 @@ interface WeatherState {
   fetchedAt: number | null;
 }
 
-function buildUrl(prefs: Prefs): string {
-  const params = new URLSearchParams({
-    lat: String(prefs.place.lat),
-    lon: String(prefs.place.lon),
-    id: prefs.place.id,
-    name: prefs.place.name,
-    provider: prefs.provider,
-    days: String(FORECAST_DAYS),
-  });
-  if (prefs.place.admin1) params.set("admin1", prefs.place.admin1);
-  if (prefs.place.country) params.set("country", prefs.place.country);
-  if (prefs.place.countryCode) params.set("countryCode", prefs.place.countryCode);
-  if (prefs.place.timezone) params.set("timezone", prefs.place.timezone);
-  return `/api/weather?${params.toString()}`;
-}
-
 export function useWeather(prefs: Prefs, ready: boolean) {
+  const runtime = useAppRuntime();
+  // Appearance changes never refetch weather.
+  const requestPrefs = useMemo(() => prefs, [prefs.place, prefs.provider, prefs.keys, prefs.locale]);
   const [state, setState] = useState<WeatherState>({
     data: null,
     error: null,
@@ -37,17 +25,17 @@ export function useWeather(prefs: Prefs, ready: boolean) {
     fetchedAt: null,
   });
   const controller = useRef<AbortController | null>(null);
-  const inFlight = useRef(false);
   const hasData = useRef(false);
   hasData.current = Boolean(state.data);
 
   const load = useCallback(
     async (silent: boolean) => {
-      if (!ready || inFlight.current) return;
-      inFlight.current = true;
-      controller.current?.abort();
+      if (!ready || controller.current || runtime.signal?.aborted) return;
       const next = new AbortController();
       controller.current = next;
+      const signal = runtime.signal
+        ? AbortSignal.any([next.signal, runtime.signal])
+        : next.signal;
       setState((current) => ({
         ...current,
         loading: !silent && !hasData.current,
@@ -55,22 +43,11 @@ export function useWeather(prefs: Prefs, ready: boolean) {
         error: silent ? current.error : null,
       }));
       try {
-        const response = await fetch(buildUrl(prefs), {
-          signal: next.signal,
-          headers: { Accept: "application/json" },
-        });
-        if (!response.ok) {
-          let code = "unknown";
-          try {
-            const body = (await response.json()) as { error?: string };
-            if (body.error) code = body.error;
-          } catch {
-            // Keep the generic code.
-          }
-          throw new Error(code);
+        const data = await runtime.services.weather(requestPrefs, signal);
+        if (signal.aborted || controller.current !== next) return;
+        if (!data || !data.current || !Array.isArray(data.daily) || !Array.isArray(data.hourly)) {
+          throw new Error("provider_error");
         }
-        const data = (await response.json()) as WeatherSnapshot;
-        if (next.signal.aborted) return;
         setState({
           data,
           error: null,
@@ -79,7 +56,7 @@ export function useWeather(prefs: Prefs, ready: boolean) {
           fetchedAt: Date.now(),
         });
       } catch (error) {
-        if (next.signal.aborted) return;
+        if (signal.aborted || controller.current !== next) return;
         const code =
           error instanceof Error && error.message && error.message !== "Failed to fetch"
             ? error.message
@@ -91,18 +68,20 @@ export function useWeather(prefs: Prefs, ready: boolean) {
           refreshing: false,
         }));
       } finally {
-        inFlight.current = false;
+        if (controller.current === next) controller.current = null;
       }
     },
-    [prefs, ready],
+    [requestPrefs, ready, runtime],
   );
 
   useEffect(() => {
     if (!ready) return;
+    hasData.current = false;
+    setState({ data: null, error: null, loading: true, refreshing: false, fetchedAt: null });
     void load(false);
     return () => {
       controller.current?.abort();
-      inFlight.current = false;
+      controller.current = null;
     };
   }, [load, ready]);
 

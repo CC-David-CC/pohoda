@@ -209,6 +209,7 @@ export const en = {
   "error.title": "Weather unavailable",
   "error.text": "The forecast could not be loaded.",
   "error.network": "Check your connection and try again.",
+  "error.backend": "The weather service is not connected. Check the configured weather API.",
   "error.provider": "The weather provider did not respond. Try another provider in Settings.",
   "error.keyRequired": "This provider needs an API key. Add it in Settings.",
   "error.keyInvalid": "The provider rejected the API key. Check it in Settings.",
