@@ -1186,6 +1186,12 @@ svg {
 }
 
 /* Weather warnings: an amber strip above the hero. */
+.official-alert-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
 .alert-banner {
   display: flex;
   align-items: center;

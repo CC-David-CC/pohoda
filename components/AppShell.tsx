@@ -234,7 +234,7 @@ function Shell() {
             </div>
           ) : null}
 
-          {data && runtime.embedded ? <OfficialAlerts snapshot={data} stale={stale} /> : null}
+          {data && runtime.embedded ? <OfficialAlerts snapshot={data} stale={stale} refreshing={refreshing} /> : null}
 
           {showError ? (
             <section className="card error-card" role="alert">

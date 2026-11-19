@@ -36,7 +36,7 @@ export function WeatherAlert({ current }: { current: CurrentWeather }) {
 }
 
 /** Only the server-verified active warning set is suitable for an official alert banner. */
-export function OfficialAlerts({ snapshot, stale }: { snapshot: WeatherSnapshot; stale: boolean }) {
+export function OfficialAlerts({ snapshot, stale, refreshing }: { snapshot: WeatherSnapshot; stale: boolean; refreshing: boolean }) {
   const [now, setNow] = useState(Date.now);
   const verifiedUntil = snapshot.alertsValidUntil ? Date.parse(snapshot.alertsValidUntil) : Date.parse(snapshot.fetchedAt) + 60_000;
   useEffect(() => {
@@ -49,10 +49,10 @@ export function OfficialAlerts({ snapshot, stale }: { snapshot: WeatherSnapshot;
 
   if (snapshot.alertStatus === "outside-coverage") return null;
   if (stale || snapshot.alertStatus !== "current" || !(Date.now() < verifiedUntil)) {
-    return <p className="banner banner-warn" role="status">Current official weather alerts are unavailable.</p>;
+    return <p className="official-alert-status" role="status">{refreshing ? "Checking alerts…" : "Alerts could not be checked."}</p>;
   }
   const active = (snapshot.alerts ?? []).filter(alert => Date.parse(alert.expires) > Date.now());
-  if (!active.length) return null;
+  if (!active.length) return <p className="official-alert-status" role="status">No active alerts</p>;
   return (
     <aside className="alert-banner" aria-label="National Weather Service alerts" role="status">
       <ul>{active.map(alert => <li key={alert.headline + alert.expires}>{alert.headline}</li>)}</ul>
